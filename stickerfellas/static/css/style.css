@@ -69,12 +69,35 @@ header {
     fill: var(--background);
 }
 
+.homepage, .shopping {
+    display: none;
+}
+
+.fullmenu {
+    display: contents;
+}
+
 .contents {
     background-color: var(--background);
     border: 3px solid var(--accent);
     border-radius: 10px;
     margin: 0 1em 1em 1em;
     padding: 0.6em;
+}
+
+.shop-all {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.listings {
+    background-color: var(--background);
+    border: 3px solid var(--accent);
+    border-radius: 10px;
+    margin: 0 1em 1em 1em;
+    padding: 0.6em;
+    width: 200px;
+    height: 180px;
 }
 
 footer {

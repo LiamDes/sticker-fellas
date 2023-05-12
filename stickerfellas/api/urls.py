@@ -3,4 +3,7 @@ from .views import *
 from . import views
 
 appname = 'api'
-urlpatterns = [ ]
+urlpatterns = [
+    path('all/', AllInventory.as_view()),
+    path('product/<int:pk>/', ItemDetail.as_view()),
+]
