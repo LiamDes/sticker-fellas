@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow&family=Darumadrop+One&display=swap');
+
+/* Waves patterns from https://www.shapedivider.app/ */
+
+:root {
+    --accent: #47caa3;
+    --background: #d9ece9;
+    --main-text: #0b1a36;
+    --header-text: #003542;
+
+    font-family: 'Barlow', sans-serif;
+    font-size: 14pt;
+
+    background-color: var(--background);
+
+    overflow-x: hidden;
+}
+
+h1 {
+    margin: 0;
+    font-family: 'Darumadrop One', cursive;
+    font-size: 36pt;
+    color: var(--background);
+    -webkit-text-stroke: 1px var(--header-text);
+}
+
+a {
+    text-decoration: none;
+    color: var(--header-text);
+}
+
+body {
+    margin: 0;
+}
+
+header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0 50px 0;
+    background: var(--accent);
+}
+
+.accounts {
+    align-self: self-end;
+    padding-right: 10px
+}
+
+.headerwaves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.headerwaves svg {
+    position: relative;
+    display: block;
+    width: calc(126% + 1.3px);
+    height: 50px;
+    transform: rotateY(180deg);
+}
+
+.headerwaves .shape-fill {
+    fill: var(--background);
+}
+
+.contents {
+    background-color: var(--background);
+    border: 3px solid var(--accent);
+    border-radius: 10px;
+    margin: 0 1em 1em 1em;
+    padding: 0.6em;
+}
+
+footer {
+    font-size: 8pt;
+}
