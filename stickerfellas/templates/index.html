@@ -66,10 +66,9 @@
             <article class="shopping" :class="{'fullmenu':showShop}">
                 <!-- Shopping for items TODO: classbind -->
                 <section class="shop-all">
-                    <div v-for="item in inventory" class="listings" href="#">
-                        <h3>[[item.name]]</h3>
-                        <img :src="item.image"/>
-                    </div>
+                    <item-listings v-for="item in inventory" class="listings" href="#"
+                    :listing="item" :key="item.id">
+                    </item-listings>
                 </section>
                 SHOPPEN
             </article>

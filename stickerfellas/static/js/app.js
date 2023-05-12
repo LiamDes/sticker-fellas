@@ -1,3 +1,4 @@
+
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -25,6 +26,23 @@ new Vue({
         }
     },
     mounted() {
-        goHome()
+        this.goHome()
     }
+})
+
+Vue.component('ItemListings', {
+    template: `
+    <div class="inner-listing">
+        <h3>[[listing.name]]</h3>
+        <img :src="listing.image" class="itempreview"/>
+    </div>`,
+    props: {
+        listing: Object,
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            hovering: false,
+        }
+    },
 })
