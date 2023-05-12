@@ -1,0 +1,15 @@
+from django.db import models
+from django.contrib.auth import get_user_model
+
+class ListItem(models.Model):
+    PRODUCT_TYPES=(('S','sticker'),('P','pin'),('H','hat'))
+
+    name = models.CharField(max_length=30)
+    description = models.CharField(max_length=1000)
+    image = models.ImageField()
+    type = models.CharField(choices=PRODUCT_TYPES,max_length=1,default="s")
+    artist = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    list_date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name
