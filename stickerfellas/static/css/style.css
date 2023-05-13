@@ -121,7 +121,7 @@ header {
     background-color: var(--background);
     border: 3px solid var(--accent);
     border-radius: 10px;
-    margin: 0 1em 1em 1em;
+    margin: 1.3em;
     padding: 0.6em;
     width: 200px;
     height: 180px;

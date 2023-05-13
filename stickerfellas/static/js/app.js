@@ -1,4 +1,3 @@
-
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -32,9 +31,10 @@ new Vue({
 
 Vue.component('ItemListings', {
     template: `
-    <div class="inner-listing">
+    <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false">
         <h3>[[listing.name]]</h3>
         <img :src="listing.image" class="itempreview"/>
+        <button v-if="hovering" @click="cartFromPreview">Add to Cart</button>
     </div>`,
     props: {
         listing: Object,
@@ -45,4 +45,9 @@ Vue.component('ItemListings', {
             hovering: false,
         }
     },
+    methods: {
+        cartFromPreview() {
+            this.$parent.shoppingCart.push(this.listing)
+        }
+    }
 })
