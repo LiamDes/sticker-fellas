@@ -24,17 +24,17 @@
                 <nav>
                     <span>Howdy, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}">LOGOUT</a>
-                    <a href="{% url 'cart' %}" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
                 </nav>
                 {% else %}
                 <nav><a href="{% url 'login' %}">LOGIN</a> or
                     <a href="{% url 'accounts:signup' %}">SIGN UP</a>
-                    <a href="{% url 'cart' %}" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
                 </nav>
                 {% endif %}
                 
             </nav>
-            <a href="{% url 'home' %}"><h1 @click="goHome">STICKER FELLAS</h1></a>
+            <h1 @click="goHome">STICKER FELLAS</h1>
             <div class="headerwaves">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
@@ -62,6 +62,16 @@
                     <div id="small-ad-3" class="secondary-ad">ARTIST SPOTLIGHT</div>
                 </section>
             </article>
+
+            <article class="shopping-cart" :class="{'fullmenu':showCart}">
+                <!-- TODO: refine view of cart -->
+                Your cart :
+                <ul>
+                    <li v-for="item in shoppingCart">
+                        [[item.name]]
+                    </li>
+                </ul>
+            </article>
                 
             <article class="shopping" :class="{'fullmenu':showShop}">
                 <!-- Shopping for items TODO: classbind -->
@@ -70,10 +80,20 @@
                     :listing="item" :key="item.id">
                     </item-listings>
                 </section>
-                
-                In yr cart:
+            </article>
 
-                [[shoppingCart]]
+            <article class="shopping" :class="{'fullmenu':showProduct}">
+                <section class="single-item">
+                    <h1>[[activeProduct.name]]</h1>
+                    <img :src="activeProduct.image" alt="image of product"/>
+                    <div class="price">[[activeProduct.price]]</div>
+                    <caption>[[activeProduct.description]]</caption>
+                    <section class="buying">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" min="1" default="1" v-model="buyingNumber">
+                        <button @click="addToCart(buyingNumber)">Add to Cart</button>
+                    </section>
+                </section>
             </article>
             {% endblock %}
         </main>

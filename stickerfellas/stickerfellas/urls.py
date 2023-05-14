@@ -11,9 +11,7 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path("accounts/", include("django.contrib.auth.urls")),
     path('accounts/', include('accounts.urls')),
-    path('products/', include('products.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
-    path('cart/', TemplateView.as_view(template_name='cart.html'), name='cart'),
 ]
 
 if settings.DEBUG: 
