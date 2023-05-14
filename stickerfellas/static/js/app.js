@@ -20,7 +20,7 @@ new Vue({
         },
         getProducts() {
             if (this.showShop) {
-                axios.get('api/all/').then(res => this.inventory = res.data)
+                axios.get('/api/all/').then(res => this.inventory = res.data)
             }
         }
     },
