@@ -35,19 +35,78 @@ Vue.component('ShoppingCart', {
         <div v-for="item in cart">
             [[item.name]]
         </div>
-        <span> TOTAL: [[totalPrice]] </span>
-        <button>Check Out!</button>
+        <span> TOTAL: [[orderSum]] </span>
+        <button @click="checkout">Check Out!</button>
     </div>`,
     props: {
-        cart: Array
+        cart: Array,
     },
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            totalPrice: 0
+            totalPrice: 0,
         }
     },
     methods: {
+        checkout() {
+            let token
+            axios({
+                url: 'https://api-m.sandbox.paypal.com/v1/oauth2/token/',
+                method: 'post',
+                auth: {
+                    username: clientID,
+                    password: secretKey
+                },
+                data: 'grant_type=client_credentials',
+                headers: {
+                    'Content-Type' : 'application/x-www-form-urlencoded'
+                }
+            }).then(res => {
+                token = res.data.access_token
+                axios({
+                    url: 'https://api-m.sandbox.paypal.com/v2/checkout/orders',
+                    method: 'post',
+                    headers: {
+                        'Authorization' : `Bearer ${token}`,
+                        'Content-Type' : 'application/json',
+                    },
+                    data: {
+                        "intent": "CAPTURE",
+                        "purchase_units": [
+                            {
+                                "reference_id": "default",
+                                "amount": {
+                                    "currency_code": "USD",
+                                    "value": "100.00",
+                                    "breakdown": {
+                                        "item_total": {
+                                            "currency_code": "USD",
+                                            "value": "100.00"
+                                        }
+                                    }
+                                },
+                                "payee": {
+                                    "email_address": "sb-uz1r525979770@business.example.com",
+                                    "merchant_id": "279MS795DM8HJ"
+                                },
+                                "items": [
+                                    {
+                                        "name": "T-Shirt",
+                                        "unit_amount": {
+                                            "currency_code": "USD",
+                                            "value": "100.00"
+                                        },
+                                        "quantity": "1",
+                                        "description": "Green XL"
+                                    }
+                                ]
+                            }
+                        ],
+                    }
+                }).then(res => {
+                    window.open(`${res.data.links[1].href}`)
+                })})
+        }
     },
     computed: {
         orderSum() {
@@ -74,6 +133,9 @@ new Vue({
         buyingNumber: 1,
         activeProduct: [],
         inventory: [],
+        stickers: [],
+        pins: [],
+        hats: [],
     },
     methods: {
         goHome() {
