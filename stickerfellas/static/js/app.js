@@ -1,3 +1,66 @@
+Vue.component('ItemListings', {
+    template: `
+    <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
+    @click="openProduct(listing.id)">
+        <h3>[[listing.name]]</h3>
+        <img :src="listing.image" class="itempreview"/>
+        <button v-if="hovering" @click.stop="cartFromPreview">Add to Cart</button>
+    </div>`,
+    props: {
+        listing: Object,
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            hovering: false,
+        }
+    },
+    methods: {
+        cartFromPreview() {
+            this.$parent.shoppingCart.push(this.listing)
+        },
+        openProduct(itemID) {
+            axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
+            this.$parent.showHome = false
+            this.$parent.showShop = false
+            this.$parent.showCart = false
+            this.$parent.showProduct = true
+        },
+    }
+})
+
+Vue.component('ShoppingCart', {
+    template: `
+    <div>
+        <div v-for="item in cart">
+            [[item.name]]
+        </div>
+        <span> TOTAL: [[totalPrice]] </span>
+        <button>Check Out!</button>
+    </div>`,
+    props: {
+        cart: Array
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            totalPrice: 0
+        }
+    },
+    methods: {
+    },
+    computed: {
+        orderSum() {
+            let sum = Number()
+            this.cart.forEach((item) => {
+                sum += Number(item.price)
+                this.totalPrice = sum.toFixed(2)
+            })
+            return this.totalPrice
+        }
+    }
+})
+
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -33,46 +96,23 @@ new Vue({
             this.showProduct = false
         },
         addToCart(quantity) {
-            this.shoppingCart.push(this.activeProduct)
+            while (quantity > 0) {
+                quantity -= 1
+                this.shoppingCart.push(this.activeProduct)
+            }
+            if (quantity === 0) {
+                this.openShop()
+            }
         },
         getProducts() {
             if (this.showShop) {
                 axios.get('/api/all/').then(res => this.inventory = res.data)
             }
         },
+
     },
     mounted() {
         this.goHome()
     },
 })
 
-Vue.component('ItemListings', {
-    template: `
-    <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
-    @click="openProduct(listing.id)">
-        <h3>[[listing.name]]</h3>
-        <img :src="listing.image" class="itempreview"/>
-        <button v-if="hovering" @click="cartFromPreview">Add to Cart</button>
-    </div>`,
-    props: {
-        listing: Object,
-    },
-    delimiters: ['[[', ']]'],
-    data: () => {
-        return {
-            hovering: false,
-        }
-    },
-    methods: {
-        cartFromPreview() {
-            this.$parent.shoppingCart.push(this.listing)
-        },
-        openProduct(itemID) {
-            axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
-            this.$parent.showHome = false
-            this.$parent.showShop = false
-            this.$parent.showCart = false
-            this.$parent.showProduct = true
-        },
-    }
-})

@@ -45,7 +45,10 @@
         </header>
 
         <nav class="contents browsebar">
-            <div @click="openShop">SHOP ALL</div> | STICKERS | PINS | HATS 
+            <div @click="openShop">SHOP ALL</div>
+            <div>STICKERS</div>
+            <div>PINS</div>
+            <div>HATS</div> 
         </nav>
 
         <main class="contents">
@@ -66,15 +69,10 @@
             <article class="shopping-cart" :class="{'fullmenu':showCart}">
                 <!-- TODO: refine view of cart -->
                 Your cart :
-                <ul>
-                    <li v-for="item in shoppingCart">
-                        [[item.name]]
-                    </li>
-                </ul>
+                <shopping-cart :cart="shoppingCart"></shopping-cart>
             </article>
                 
             <article class="shopping" :class="{'fullmenu':showShop}">
-                <!-- Shopping for items TODO: classbind -->
                 <section class="shop-all">
                     <item-listings v-for="item in inventory" class="listings"
                     :listing="item" :key="item.id">

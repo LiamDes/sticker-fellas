@@ -5,8 +5,8 @@
 :root {
     --accent: #47caa3;
     --background: #d9ece9;
-    --main-text: #0b1a36;
-    --header-text: #003542;
+    --main-text: #0b2b49;
+    --header-text: #0e8178;
 
     font-family: 'Barlow', sans-serif;
     font-size: 14pt;
@@ -21,7 +21,7 @@ h1 {
     font-family: 'Darumadrop One', cursive;
     font-size: 36pt;
     color: var(--background);
-    -webkit-text-stroke: 1px var(--header-text);
+    -webkit-text-stroke: 1px var(--main-text);
 }
 
 h3 {
@@ -31,7 +31,7 @@ h3 {
 
 a {
     text-decoration: none;
-    color: var(--header-text);
+    color: var(--main-text);
 }
 
 body {
@@ -88,6 +88,22 @@ header {
     border-radius: 10px;
     margin: 0 1em 1em 1em;
     padding: 0.6em;
+}
+
+.browsebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.browsebar>*{
+    color: var(--background);
+    background-color: var(--header-text);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    width: 5em;
+    text-align: center;
+    cursor: pointer;
 }
 
 .primary-banner {
@@ -150,6 +166,10 @@ header {
 .price {
     font-weight: 700;
     font-size: 10pt;
+}
+
+input[type=number] {
+    width: 3em;
 }
 
 footer {
