@@ -129,13 +129,11 @@ new Vue({
         showShop: false,
         showCart: false,
         showProduct: false,
+        type: null,
         shoppingCart: [],
         buyingNumber: 1,
         activeProduct: [],
-        inventory: [],
-        stickers: [],
-        pins: [],
-        hats: [],
+        inventory: []
     },
     methods: {
         goHome() {
@@ -144,12 +142,12 @@ new Vue({
             this.showCart = false
             this.showProduct = false
         },
-        openShop() {
+        openShop(type) {
             this.showHome = false
             this.showShop = true
             this.showCart = false
             this.showProduct = false
-            this.getProducts()
+            this.getProducts(type)
         },
         openCart() {
             this.showHome = false
@@ -163,12 +161,16 @@ new Vue({
                 this.shoppingCart.push(this.activeProduct)
             }
             if (quantity === 0) {
-                this.openShop()
+                this.openShop(this.activeProduct.type)
             }
         },
-        getProducts() {
-            if (this.showShop) {
+        getProducts(sort) {
+            if (sort === null) {
                 axios.get('/api/all/').then(res => this.inventory = res.data)
+            } else {
+                axios.get('/api/type/', {
+                    params: { type: sort }
+                }).then(res => this.inventory = res.data)
             }
         },
 

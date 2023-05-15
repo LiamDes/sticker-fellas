@@ -46,10 +46,10 @@
         </header>
 
         <nav class="contents browsebar">
-            <div @click="openShop">SHOP ALL</div>
-            <div>STICKERS</div>
-            <div>PINS</div>
-            <div>HATS</div> 
+            <div @click="openShop(null)">SHOP ALL</div>
+            <div @click="openShop('S')">STICKERS</div>
+            <div @click="openShop('P')">PINS</div>
+            <div @click="openShop('H')">HATS</div> 
         </nav>
 
         <main class="contents">
@@ -75,9 +75,12 @@
                 
             <article class="shopping" :class="{'fullmenu':showShop}">
                 <section class="shop-all">
-                    <item-listings v-for="item in inventory" class="listings"
+                    <item-listings v-if="inventory.length > 0" v-for="item in inventory" class="listings"
                     :listing="item" :key="item.id">
                     </item-listings>
+                    <div v-if="inventory.length === 0">
+                        Nothing here yet! Check back later. ☺
+                    </div>
                 </section>
             </article>
 
