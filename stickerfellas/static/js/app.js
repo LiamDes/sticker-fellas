@@ -77,11 +77,11 @@ Vue.component('ShoppingCart', {
                                 "reference_id": "default",
                                 "amount": {
                                     "currency_code": "USD",
-                                    "value": "100.00",
+                                    "value": `${this.totalPrice}`,
                                     "breakdown": {
                                         "item_total": {
                                             "currency_code": "USD",
-                                            "value": "100.00"
+                                            "value": `${this.totalPrice}`
                                         }
                                     }
                                 },
@@ -89,17 +89,17 @@ Vue.component('ShoppingCart', {
                                     "email_address": "sb-uz1r525979770@business.example.com",
                                     "merchant_id": "279MS795DM8HJ"
                                 },
-                                "items": [
-                                    {
-                                        "name": "T-Shirt",
-                                        "unit_amount": {
-                                            "currency_code": "USD",
-                                            "value": "100.00"
-                                        },
-                                        "quantity": "1",
-                                        "description": "Green XL"
-                                    }
-                                ]
+                                // "items": [
+                                //     {
+                                //         "name": "T-Shirt",
+                                //         "unit_amount": {
+                                //             "currency_code": "USD",
+                                //             "value": `${this.totalPrice}`
+                                //         },
+                                //         "quantity": "1",
+                                //         "description": "Green XL"
+                                //     }
+                                // ]
                             }
                         ],
                     }
