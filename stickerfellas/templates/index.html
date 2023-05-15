@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="{% static 'js/secrets.js' %}"></script>
+    <script defer src="https://www.paypal.com/sdk/js?client-id=AUhMRIxcUxDngr22YGQyKHLdYJ5ehSS3EkJzipZD3x2rMRgsMam9GGgbvkZjnvMMj7f0LplIIzehiHFj&locale=en_US"></script>
     <script src="{% static 'js/app.js' %}" defer></script>
     
     <title>{% block title %}STICKER FELLAS - Stickers and More!{% endblock %}</title>
@@ -71,6 +72,7 @@
                 <!-- TODO: refine view of cart -->
                 Your cart :
                 <shopping-cart :cart="shoppingCart"></shopping-cart>
+                <paypal-checkout></paypal-checkout>
             </article>
                 
             <article class="shopping" :class="{'fullmenu':showShop}">
