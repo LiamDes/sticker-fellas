@@ -69,6 +69,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # CORS_ALLOW_CREDENTIALS = True
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
+# SECURE_CROSS_ORIGIN_OPENER_POLICY='unsafe-none'
+
 ROOT_URLCONF = 'stickerfellas.urls'
 
 TEMPLATES = [

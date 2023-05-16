@@ -36,40 +36,78 @@ Vue.component('PaypalCheckout', {
     template: `
         <paypal-buttons :on-approve="onApprove" :create-order="createOrder" :on-shipping-change="onShippingChange" :on-error="onError" :style-object="style" />
     `,
+    // 
     components: {
         'paypal-buttons': PayPalButton,
     },
     computed: {
         createOrder: function () {
-        return (data) => {
-            // Order is created on the server and the order id is returned
-            return fetch("https://api-m.sandbox.paypal.com/v2/checkout/orders", {
-            // return fetch("/my-server/create-paypal-order", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization' : `Basic ${clientID}:${secretKey}`,
-            },
-            // use the "body" param to optionally pass additional order information
-            // like product skus and quantities
-            body: JSON.stringify({
-                cart: this.$parent.shoppingCart // [
-                    
-                // {
-                //     sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
-                //     quantity: "YOUR_PRODUCT_QUANTITY",
-                // },
-                //],
-            }),
-            })
-            .then((response) => response.json())
-            .then((order) => order.id);
-        }
+            return (data) => {
+                let token
+                axios({
+                    url: 'https://api-m.sandbox.paypal.com/v1/oauth2/token/',
+                    method: 'post',
+                    auth: {
+                        username: clientID,
+                        password: secretKey
+                    },
+                    data: 'grant_type=client_credentials',
+                    headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded'
+                    }
+                }).then(res => {
+                    token = res.data.access_token
+                // Order is created on the server and the order id is returned
+                    return fetch("https://api-m.sandbox.paypal.com/v2/checkout/orders", {
+                    // return fetch("/my-server/create-paypal-order", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Authorization' : `Bearer ${token}`,
+                    },
+                    // use the "body" param to optionally pass additional order information
+                    // like product skus and quantities
+                    body: JSON.stringify({
+                        // cart: [   
+                        // {
+                        //     sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
+                        //     quantity: "YOUR_PRODUCT_QUANTITY",
+                        // },
+                        // ],
+                        "intent": "CAPTURE",
+                        "purchase_units": [
+                            {
+                                "reference_id": "default",
+                                "amount": {
+                                    "currency_code": "USD",
+                                    "value": "0.99",
+                                    "breakdown": {
+                                        "item_total": {
+                                            "currency_code": "USD",
+                                            "value": "0.99"
+                                        }
+                                    }
+                                },
+                                "payee": {
+                                    "email_address": "sb-uz1r525979770@business.example.com",
+                                    "merchant_id": "279MS795DM8HJ"
+                                },
+                            }
+                        ]
+                    }),
+                    })
+                    .then((response) => response.json())
+                    .then((order) => {
+                        return order.id
+                    })
+                })
+            }
         },
         onApprove: function () {
         return (data) => {
             // Order is captured on the server
-            return fetch("/my-server/capture-paypal-order", {
+            console.log(data)
+            return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -92,7 +130,7 @@ Vue.component('PaypalCheckout', {
         onError: function () {
         return (err) => {
             console.error(err)
-            window.location.href = '/error/'
+            // window.location.href = '/error/'
         }
         },
         style: function () {
@@ -114,6 +152,7 @@ Vue.component('ShoppingCart', {
             [[item.name]]
         </div>
         <span> TOTAL: [[orderSum]] </span>
+        <button @click="checkout">a</button>
     </div>`,
 // removed checkout button temporarily
     props: {
@@ -146,6 +185,7 @@ Vue.component('ShoppingCart', {
                     url: 'https://api-m.sandbox.paypal.com/v2/checkout/orders',
                     method: 'post',
                     headers: {
+                        // 'PayPal-Request-Id': 'dfdfdsfdsfdsdssdf',
                         'Authorization' : `Bearer ${token}`,
                         'Content-Type' : 'application/json',
                     },
@@ -168,6 +208,14 @@ Vue.component('ShoppingCart', {
                                     "email_address": "sb-uz1r525979770@business.example.com",
                                     "merchant_id": "279MS795DM8HJ"
                                 },
+                                "payment_source": { 
+                                    "paypal": { 
+                                        "experience_context": { 
+                                            "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", 
+                                            "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", 
+                                            "locale": "en-US", "landing_page": "LOGIN", 
+                                            "shipping_preference": "SET_PROVIDED_ADDRESS", "user_action": "PAY_NOW", 
+                                            } } }
                             }
                         ],
                     }
@@ -175,18 +223,18 @@ Vue.component('ShoppingCart', {
                     orderID = res.data.id
                     window.open(res.data.links[1].href)
                     console.log('order created')
-                    axios({
-                        url: `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderID}/capture`,
-                        method: 'post',
-                        headers: {
-                            'Authorization' : `Bearer ${token}`,
-                            'Content-Type' : 'application/json',
-                        },
-                        data: {
-                            "id": orderID,
-                            "intent": "CAPTURE",
-                        }
-                    })
+                    // axios({
+                    //     url: `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderID}/capture`,
+                    //     method: 'post',
+                    //     headers: {
+                    //         'Authorization' : `Bearer ${token}`,
+                    //         'Content-Type' : 'application/json',
+                    //     },
+                    //     data: {
+                    //         "id": orderID,
+                    //         "intent": "CAPTURE",
+                    //     }
+                    // })
                     // need to capture order somehow despite going to a new page
                     // ORDER_NOT_APPROVED: Payer has not yet approved the order for 
                     // payment. Redirect the payer to the approve URL returned as 

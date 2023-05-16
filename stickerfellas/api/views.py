@@ -11,14 +11,17 @@ class AllInventory(generics.ListAPIView):
     serializer_class = ItemSerializer
     queryset = ListItem.objects.all().reverse()
 
+
 class ItemDetail(generics.RetrieveAPIView):
     serializer_class = ItemSerializer
 
     def get_queryset(self):
         return ListItem.objects.filter(pk=self.kwargs['pk'])
     
+
 class AllCategory(generics.ListAPIView):
     serializer_class = ItemSerializer
     def get_queryset(self):
         type = self.request.GET.get('type')
         return ListItem.objects.filter(type=type)
+    

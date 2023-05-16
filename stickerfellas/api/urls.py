@@ -1,4 +1,5 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
+# from django_paypal import views
 from .views import *
 from . import views
 
