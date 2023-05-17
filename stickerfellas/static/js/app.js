@@ -1,3 +1,5 @@
+paypal.Buttons.driver("vue", window.Vue);
+
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -29,122 +31,6 @@ Vue.component('ItemListings', {
     }
 })
 
-const PayPalButton = paypal.Buttons.driver('vue', window.Vue)
-
-Vue.component('PaypalCheckout', {
-// The style prop for the PayPal button should be passed in as `style-object` or `styleObject` to avoid conflict with Vue's `style` reserved prop.
-    template: `
-        <paypal-buttons :on-approve="onApprove" :create-order="createOrder" :on-shipping-change="onShippingChange" :on-error="onError" :style-object="style" />
-    `,
-    // 
-    components: {
-        'paypal-buttons': PayPalButton,
-    },
-    computed: {
-        createOrder: function () {
-            return (data) => {
-                let token
-                axios({
-                    url: 'https://api-m.sandbox.paypal.com/v1/oauth2/token/',
-                    method: 'post',
-                    auth: {
-                        username: clientID,
-                        password: secretKey
-                    },
-                    data: 'grant_type=client_credentials',
-                    headers: {
-                        'Content-Type' : 'application/x-www-form-urlencoded'
-                    }
-                }).then(res => {
-                    token = res.data.access_token
-                // Order is created on the server and the order id is returned
-                    return fetch("https://api-m.sandbox.paypal.com/v2/checkout/orders", {
-                    // return fetch("/my-server/create-paypal-order", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        'Authorization' : `Bearer ${token}`,
-                    },
-                    // use the "body" param to optionally pass additional order information
-                    // like product skus and quantities
-                    body: JSON.stringify({
-                        // cart: [   
-                        // {
-                        //     sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
-                        //     quantity: "YOUR_PRODUCT_QUANTITY",
-                        // },
-                        // ],
-                        "intent": "CAPTURE",
-                        "purchase_units": [
-                            {
-                                "reference_id": "default",
-                                "amount": {
-                                    "currency_code": "USD",
-                                    "value": "0.99",
-                                    "breakdown": {
-                                        "item_total": {
-                                            "currency_code": "USD",
-                                            "value": "0.99"
-                                        }
-                                    }
-                                },
-                                "payee": {
-                                    "email_address": "sb-uz1r525979770@business.example.com",
-                                    "merchant_id": "279MS795DM8HJ"
-                                },
-                            }
-                        ]
-                    }),
-                    })
-                    .then((response) => response.json())
-                    .then((order) => {
-                        return order.id
-                    })
-                })
-            }
-        },
-        onApprove: function () {
-        return (data) => {
-            // Order is captured on the server
-            console.log(data)
-            return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                orderID: data.orderID
-            })
-            })
-            .then((response) => response.json());
-        }
-        },
-        onShippingChange: function () {
-        return (data, actions) => {
-            if (data.shipping_address.country_code !== 'US') {
-            return actions.reject()
-            }
-            return actions.resolve()
-        }
-        },
-        onError: function () {
-        return (err) => {
-            console.error(err)
-            // window.location.href = '/error/'
-        }
-        },
-        style: function () {
-        return {
-            shape: 'pill',
-            color: 'gold',
-            layout: 'horizontal',
-            label: 'paypal',
-            tagline: false,
-        }
-        },
-    },
-})
-
 Vue.component('ShoppingCart', {
     template: `
     <div>
@@ -154,7 +40,6 @@ Vue.component('ShoppingCart', {
         <span> TOTAL: [[orderSum]] </span>
         <button @click="checkout">a</button>
     </div>`,
-// removed checkout button temporarily
     props: {
         cart: Array,
     }, 
@@ -166,80 +51,7 @@ Vue.component('ShoppingCart', {
     },
     methods: {
         checkout() {
-            let token
-            let orderID
-            axios({
-                url: 'https://api-m.sandbox.paypal.com/v1/oauth2/token/',
-                method: 'post',
-                auth: {
-                    username: clientID,
-                    password: secretKey
-                },
-                data: 'grant_type=client_credentials',
-                headers: {
-                    'Content-Type' : 'application/x-www-form-urlencoded'
-                }
-            }).then(res => {
-                token = res.data.access_token
-                axios({
-                    url: 'https://api-m.sandbox.paypal.com/v2/checkout/orders',
-                    method: 'post',
-                    headers: {
-                        // 'PayPal-Request-Id': 'dfdfdsfdsfdsdssdf',
-                        'Authorization' : `Bearer ${token}`,
-                        'Content-Type' : 'application/json',
-                    },
-                    data: {
-                        "intent": "CAPTURE",
-                        "purchase_units": [
-                            {
-                                "reference_id": "default",
-                                "amount": {
-                                    "currency_code": "USD",
-                                    "value": `${this.totalPrice}`,
-                                    "breakdown": {
-                                        "item_total": {
-                                            "currency_code": "USD",
-                                            "value": `${this.totalPrice}`
-                                        }
-                                    }
-                                },
-                                "payee": {
-                                    "email_address": "sb-uz1r525979770@business.example.com",
-                                    "merchant_id": "279MS795DM8HJ"
-                                },
-                                "payment_source": { 
-                                    "paypal": { 
-                                        "experience_context": { 
-                                            "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", 
-                                            "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", 
-                                            "locale": "en-US", "landing_page": "LOGIN", 
-                                            "shipping_preference": "SET_PROVIDED_ADDRESS", "user_action": "PAY_NOW", 
-                                            } } }
-                            }
-                        ],
-                    }
-                }).then(res => {
-                    orderID = res.data.id
-                    window.open(res.data.links[1].href)
-                    console.log('order created')
-                    // axios({
-                    //     url: `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderID}/capture`,
-                    //     method: 'post',
-                    //     headers: {
-                    //         'Authorization' : `Bearer ${token}`,
-                    //         'Content-Type' : 'application/json',
-                    //     },
-                    //     data: {
-                    //         "id": orderID,
-                    //         "intent": "CAPTURE",
-                    //     }
-                    // })
-                    // need to capture order somehow despite going to a new page
-                    // ORDER_NOT_APPROVED: Payer has not yet approved the order for 
-                    // payment. Redirect the payer to the approve URL returned as 
-                    // part of the HATEOAS links within the create order call.
-                })})
+            
         }
     },
     computed: {
@@ -267,7 +79,7 @@ new Vue({
         shoppingCart: [],
         buyingNumber: 1,
         activeProduct: [],
-        inventory: []
+        inventory: [],
     },
     methods: {
         goHome() {
