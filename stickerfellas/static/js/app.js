@@ -34,11 +34,11 @@ Vue.component('ItemListings', {
 Vue.component('ShoppingCart', {
     template: `
     <div>
-        <div v-for="item in cart">
-            [[item.name]]
+        <div v-for="item of itemCounts">
+            <strong>[[item.name]]</strong> x[[item.count]]
         </div>
         <span> TOTAL: [[orderSum]] </span>
-        <button @click="checkout">a</button>
+        <button @click="checkout">Checkout</button>
     </div>`,
     props: {
         cart: Array,
@@ -47,11 +47,28 @@ Vue.component('ShoppingCart', {
     data: () => {
         return {
             totalPrice: 0,
+            itemCounts: {}
         }
     },
     methods: {
         checkout() {
             
+        },
+        formatCart() {
+            let counter = Number()
+            for ([index, product] of this.cart.entries()) {
+                let matches = Object.keys(this.itemCounts)
+                console.log(matches)
+                if (!(matches.includes(product.id.toString()))) {
+                    console.log(product.id.toString())
+                    counter = 1
+                } else {
+                    counter++
+                }
+                this.itemCounts[product.id] = {name: product.name, price: product.price, count: counter}
+            }
+            console.log(this.itemCounts)
+            return this.itemCounts
         }
     },
     computed: {
@@ -62,7 +79,23 @@ Vue.component('ShoppingCart', {
                 this.totalPrice = sum.toFixed(2)
             })
             return this.totalPrice
-        }
+        },
+        // formatCart() {
+        //     let counter = Number()
+        //     for ([index, product] of this.cart.entries()) { 
+        //         let matches = Object.keys(this.itemCounts)
+        //         if (!(product.id in matches)) {
+        //             counter = 1
+        //         } else {
+        //             counter++
+        //         }
+        //         this.itemCounts[product.id] = {name: product.name, price: product.price, count: counter}
+        //     }
+        //     return this.itemCounts
+        // }
+    },
+    updated() {
+        this.formatCart()
     }
 })
 
