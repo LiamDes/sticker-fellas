@@ -19,7 +19,17 @@ Vue.component('ItemListings', {
     },
     methods: {
         cartFromPreview() {
-            this.$parent.shoppingCart.push(this.listing)
+            this.$parent.shoppingCart.forEach(listing => {
+                if (listing.product.id === this.listing.id) {this.$parent.newItem = false}
+            })
+            if (this.$parent.newItem) {
+                this.$parent.shoppingCart.push({quantity: 1, product: this.listing, price: this.listing.price})
+            } else {
+                let match = this.$parent.shoppingCart.find(product => product.product.id === this.listing.id)
+                match.quantity = parseInt(match.quantity) + 1
+                match.price = (match.quantity * match.product.price).toFixed(2)
+            }
+            this.$parent.newItem = true
         },
         openProduct(itemID) {
             axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
@@ -34,10 +44,11 @@ Vue.component('ItemListings', {
 Vue.component('ShoppingCart', {
     template: `
     <div>
-        <div v-for="item of itemCounts">
-            <strong>[[item.name]]</strong> x[[item.count]]
+        <div v-for="item in cart">
+            <strong>[[item.product.name]]</strong> x[[item.quantity]] ([[item.price]])
         </div>
-        <span> TOTAL: [[orderSum]] </span>
+        <p>SHIPPING: <span v-if="shipping > 0">$[[shipping]]</span><span v-else>FREE</span></p>
+        <span> TOTAL: $[[orderSum]] </span>
         <button @click="checkout">Checkout</button>
     </div>`,
     props: {
@@ -47,55 +58,29 @@ Vue.component('ShoppingCart', {
     data: () => {
         return {
             totalPrice: 0,
-            itemCounts: {}
+            shipping: '5.00'
         }
     },
     methods: {
         checkout() {
             
-        },
-        formatCart() {
-            let counter = Number()
-            for ([index, product] of this.cart.entries()) {
-                let matches = Object.keys(this.itemCounts)
-                console.log(matches)
-                if (!(matches.includes(product.id.toString()))) {
-                    console.log(product.id.toString())
-                    counter = 1
-                } else {
-                    counter++
-                }
-                this.itemCounts[product.id] = {name: product.name, price: product.price, count: counter}
-            }
-            console.log(this.itemCounts)
-            return this.itemCounts
         }
     },
     computed: {
         orderSum() {
             let sum = Number()
+            sum += parseFloat(this.shipping)
             this.cart.forEach((item) => {
                 sum += Number(item.price)
                 this.totalPrice = sum.toFixed(2)
             })
             return this.totalPrice
         },
-        // formatCart() {
-        //     let counter = Number()
-        //     for ([index, product] of this.cart.entries()) { 
-        //         let matches = Object.keys(this.itemCounts)
-        //         if (!(product.id in matches)) {
-        //             counter = 1
-        //         } else {
-        //             counter++
-        //         }
-        //         this.itemCounts[product.id] = {name: product.name, price: product.price, count: counter}
-        //     }
-        //     return this.itemCounts
-        // }
-    },
-    updated() {
-        this.formatCart()
+        calcShipping() {
+            if (this.totalPrice > 30) {
+                return this.shipping = '0.00'
+            } else { return this.shipping = '5.00' }
+        }
     }
 })
 
@@ -109,6 +94,7 @@ new Vue({
         showCart: false,
         showProduct: false,
         type: null,
+        newItem: true,
         shoppingCart: [],
         buyingNumber: 1,
         activeProduct: [],
@@ -135,14 +121,19 @@ new Vue({
             this.showProduct = false
         },
         addToCart(quantity) {
-            while (quantity > 0) {
-                quantity -= 1
-                this.shoppingCart.push(this.activeProduct)
+            this.shoppingCart.forEach(listing => {
+                if (listing.product.id === this.activeProduct.id) {this.newItem = false}
+            })
+            if (this.newItem) {
+                this.shoppingCart.push( {quantity: quantity, product: this.activeProduct, price: (quantity * this.activeProduct.price).toFixed(2)})
+            } else {
+                let match = this.shoppingCart.find(product => product.product.id === this.activeProduct.id)
+                match.quantity = parseInt(match.quantity) + parseInt(quantity)
+                match.price = (match.quantity * match.product.price).toFixed(2)
             }
-            if (quantity === 0) {
-                this.openShop(this.activeProduct.type)
-            }
+            this.openShop(this.activeProduct.type)
             this.buyingNumber = 1
+            this.newItem = true
         },
         getProducts(sort) {
             if (sort === null) {
