@@ -62,8 +62,10 @@
             {% block content %}
             <article class="homepage" :class="{'fullmenu':showHome}">
                 <!-- Main Page display TODO: classbind-->
-                <section class="primary-banner">
-                    MAIN SALE PROMO THING!!!! STICKERS!!!!!!!!
+                <section class="primary-banner" @click="openShop('S')">
+                    <h1 class="primary-header">STICKERS</h1>
+                    <img src="{% static 'ad/primary.png' %}" alt="sticker promo image" class="primary-banner-promo">
+                    <div class="primary-block">Animal designs and more with our die-cut stickers!</div>
                 </section>
                 <section class="secondary-banners">
                     <div id="small-ad-1" class="secondary-ad">FUNNY HATS</div>
