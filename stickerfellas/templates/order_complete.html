@@ -10,9 +10,15 @@
 {% endblock %}
 
 {% block content %}
+    <div class="order-details">
+        <h3>Thank you for your order, {{info.customer_details.name}}!</h3>
+        Order Number: <strong>{{info.id}}</strong>
+        <ul><strong>Order info</strong>:
+        {% for product in info.line_items.data %}
+            <li>{{product.description}} x{{product.quantity}}</li>
+        {% endfor %}
+        </ul>
 
-    <h3>Thank you for your order, {{info.customer_details.name}}!</h3>
-
-    <p>Order for {{ info.customer_details.email }}</p>
-
+        A copy of this confirmation has been sent to {{ info.customer_details.email }}
+    </div>
 {% endblock %}

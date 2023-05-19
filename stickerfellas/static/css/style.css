@@ -7,6 +7,7 @@
     --background: #d9ece9;
     --main-text: #0b2b49;
     --header-text: #0e8178;
+    --active-tab: #03423d;
 
     font-family: 'Barlow', sans-serif;
     font-size: 14pt;
@@ -79,6 +80,18 @@ header {
     fill: var(--background);
 }
 
+.addingitem {
+    animation-name: cartwiggle;
+    animation-duration: 1s;
+    /* overflow-x: hidden; */
+}
+
+@keyframes cartwiggle {
+    20% { transform: rotate(50deg);}
+    50%{ transform: scale(200%);}
+    80% { transform: rotate(-50deg);}
+}
+
 .homepage, .shopping, .shopping-cart {
     display: none;
 }
@@ -111,11 +124,40 @@ header {
     cursor: pointer;
 }
 
+.browsebar>*:active{
+    background-color: var(--active-tab);
+}
+
 .primary-banner {
-    /* TODO */
-    background-color: var(--header-text);
+    background-image: linear-gradient(45deg, #f1faf8, #8ec0ab);
+    border-top: 2px solid var(--header-text);
+    border-bottom: 2px solid var(--header-text);
     height: 300px;
     margin-bottom: 1em;
+    text-align: center;
+    display: grid;
+    grid-template-areas: 
+        'header'
+        'promo'
+        'ad-text';
+
+    cursor: pointer;
+}
+
+.primary-header {
+    grid-area: header;
+    font-size: 26pt;
+}
+
+.primary-banner-promo {
+    width: 200px;
+    grid-area: promo;
+    margin: auto;
+}
+
+.primary-block {
+    grid-area: ad-text;
+    background-color: var(--accent);
 }
 
 .secondary-banners {
@@ -130,12 +172,43 @@ header {
     height: 300px;
     border-radius: 10px;
 
+    background-image: linear-gradient(180deg, #f1faf8, #8ec0ab);
+    filter: drop-shadow(3px 3px 4px var(--header-text));
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.secondary-ad h3 {
+    background-color: var(--accent);
+    text-align: center;
+    width: 100%;
+    line-height: 3em;
+
+    color: var(--header-text);
+    -webkit-text-stroke: 1px var(--main-text);
+    font-size: 20pt;
+}
+
+.secondary-banner-promo {
+    width: 160px;
+    filter: drop-shadow(3px 3px 4px #00271d);
+}
+
+button {
     background-color: var(--header-text);
+    color: var(--background);
+    border-radius: 4px;
 }
 
 .shop-all {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-around;
 }
 
 .listings {
@@ -177,17 +250,93 @@ input[type=number] {
     width: 3em;
 }
 
+.order-details {
+    word-wrap: break-word;
+    text-align: center;
+}
+
+.order-details ul {
+    list-style-type: none;
+    padding: 0;
+}
+
 footer {
     font-size: 8pt;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-image: linear-gradient(180deg, var(--accent),
+    var(--background), var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-corner {
+    background: rgba(255, 255, 255, 0);
+    border-radius: 7px;
+}
+
 /* Tablet Display */
 @media screen and (min-width: 680px) {
+
+    .primary-banner {
+    grid-template-areas: 
+        'promo header'
+        'ad-text ad-text';
+    }
+
+    .primary-header {
+        font-size: 30pt;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .primary-banner-promo {
+        width: 250px;
+    }
+
+    .primary-block {
+        padding-top: 0.4em;
+    }
 
     .secondary-banners {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: unset;
         justify-content: space-around;
+    }
+
+    .secondary-banner-promo:hover {
+        width: 170px;
+        transition: width 0.3s;
+    }
+}
+
+@media screen and (min-width: 1100px) {
+
+    .primary-banner {
+        grid-template-rows: 250px 50px;
+    }
+
+    .primary-header {
+        font-size: 42pt;
+    }
+
+    .primary-banner-promo {
+        z-index: 2;
+        width: 300px;
+    }
+
+    .primary-block {
+        text-align: right;
+        padding-right: 2em;
     }
 }

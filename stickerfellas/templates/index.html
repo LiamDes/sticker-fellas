@@ -26,12 +26,12 @@
                 <nav>
                     <span>Howdy, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}">LOGOUT</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
                 </nav>
                 {% else %}
                 <nav><a href="{% url 'login' %}">LOGIN</a> or
                     <a href="{% url 'accounts:signup' %}">SIGN UP</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
                 </nav>
                 {% endif %}
                 
@@ -62,13 +62,24 @@
             {% block content %}
             <article class="homepage" :class="{'fullmenu':showHome}">
                 <!-- Main Page display TODO: classbind-->
-                <section class="primary-banner">
-                    MAIN SALE PROMO THING!!!! STICKERS!!!!!!!!
+                <section class="primary-banner" @click="openShop('S')">
+                    <h1 class="primary-header">STICKERS</h1>
+                    <img src="{% static 'ad/primary.png' %}" alt="sticker promo image" class="primary-banner-promo">
+                    <div class="primary-block">Animal designs and more with our die-cut stickers!</div>
                 </section>
                 <section class="secondary-banners">
-                    <div id="small-ad-1" class="secondary-ad">FUNNY HATS</div>
-                    <div id="small-ad-2" class="secondary-ad">AMAZING PINS</div>
-                    <div id="small-ad-3" class="secondary-ad">ARTIST SPOTLIGHT</div>
+                    <div id="small-ad-1" class="secondary-ad" @click="openShop('H')">
+                        <h3>FUNNY HATS</h3>
+                        <img src="{% static 'ad/ad_hat.png' %}" alt="hat promo image" class="secondary-banner-promo">
+                    </div>
+                    <div id="small-ad-2" class="secondary-ad" @click="openShop('P')">
+                        <img src="{% static 'ad/ad_pin.png' %}" alt="pin promo image" class="secondary-banner-promo">
+                        <h3>AMAZING PINS</h3>
+                    </div>
+                    <div id="small-ad-3" class="secondary-ad">
+
+                        <h3>SPOTLIGHT</h3>
+                    </div>
                 </section>
             </article>
 
