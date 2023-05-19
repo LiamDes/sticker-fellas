@@ -45,9 +45,7 @@ Vue.component('ShoppingCart', {
         <div v-for="item in cart">
             <strong>[[item.product.name]]</strong> x[[item.quantity]] ([[item.price]])
         </div>
-        <p>SHIPPING: <span v-if="shipping > 0">$[[shipping]]</span><span v-else>FREE</span></p>
         <span> TOTAL: $[[orderSum]] </span>
-        <button @click="checkout">Checkout</button>
     </div>`,
     props: {
         cart: Array,
@@ -56,28 +54,16 @@ Vue.component('ShoppingCart', {
     data: () => {
         return {
             totalPrice: 0,
-            shipping: '5.00'
-        }
-    },
-    methods: {
-        checkout() {
-            
         }
     },
     computed: {
         orderSum() {
             let sum = Number()
-            sum += parseFloat(this.shipping)
             this.cart.forEach((item) => {
                 sum += Number(item.price)
                 this.totalPrice = sum.toFixed(2)
             })
             return this.totalPrice
-        },
-        calcShipping() {
-            if (this.totalPrice > 30) {
-                return this.shipping = '0.00'
-            } else { return this.shipping = '5.00' }
         }
     }
 })
@@ -97,6 +83,7 @@ new Vue({
         activeProduct: [],
         inventory: [],
         stripeKey: '',
+        token: '',
         stripe: null,
     },
     methods: {
@@ -151,7 +138,7 @@ new Vue({
             const data = {
                 items: cart
             }
-            axios.post('/api/stripe/checkoutsession/', data)
+            axios.post('/api/stripe/checkoutsession/', data, { headers: { 'X-CSRFToken': this.token } })
             .then(res => {
                 console.log(res.data)
                 return this.stripe.redirectToCheckout({sessionId: res.data.sessionId})
@@ -160,7 +147,8 @@ new Vue({
         },
     },
     mounted() {
-        this.goHome()
+        this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value
         this.getStripeKey()
+        this.goHome()
     },
 })

@@ -6,4 +6,4 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListItem
         fields = ['id', 'name', 'description', 'image', 
-                  'price', 'type', 'artist', 'list_date']
+                  'price', 'type', 'price_id', 'artist', 'list_date']

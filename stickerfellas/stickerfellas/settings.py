@@ -29,11 +29,6 @@ STRIPE_SECRET_KEY = 'sk_test_51N9EumJgrzFtfn7GNSxzdC7QO5dPdtMxsIq3CYtmJk6KX67JaN
 PAYMENT_SUCCESS_URL = 'http://127.0.0.1:8000/complete/'
 PAYMENT_CANCEL_URL = 'http://127.0.0.1:8000/'
 
-#stickers
-PRICE_ID_DOGGY_S = 'price_1N9FsTJgrzFtfn7Gy6NtNvSg'
-#pins
-PRICE_ID_3DOG_P = 'price_1N9FtUJgrzFtfn7GqXO6TlLz'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
