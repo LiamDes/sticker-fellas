@@ -17,6 +17,11 @@ Vue.component('ItemListings', {
     },
     methods: {
         cartFromPreview() {
+            this.$parent.addingToCart = true
+            setTimeout(() => {
+                this.$parent.addingToCart = false
+            }, 1000)
+
             this.$parent.shoppingCart.forEach(listing => {
                 if (listing.product.id === this.listing.id) {this.$parent.newItem = false}
             })
@@ -80,6 +85,7 @@ new Vue({
         newItem: true,
         shoppingCart: [],
         buyingNumber: 1,
+        addingToCart: false,
         activeProduct: [],
         inventory: [],
         stripeKey: '',
@@ -107,6 +113,11 @@ new Vue({
             this.showProduct = false
         },
         addToCart(quantity) {
+            this.addingToCart = true
+            setTimeout(() => {
+                this.addingToCart = false
+            }, 1000)
+
             this.shoppingCart.forEach(listing => {
                 if (listing.product.id === this.activeProduct.id) {this.newItem = false}
             })
@@ -145,6 +156,18 @@ new Vue({
             })
             .catch(err => console.error(err))
         },
+    },
+    computed: {
+        cartQuantity() {
+            if (this.shoppingCart.length > 0) {
+                let quantity = Number()
+                quantity = 0
+                this.shoppingCart.forEach(item => {
+                    quantity += parseInt(item.quantity)
+                })
+                return quantity
+            } else {return ''}
+        }
     },
     mounted() {
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value

@@ -7,6 +7,7 @@
     --background: #d9ece9;
     --main-text: #0b2b49;
     --header-text: #0e8178;
+    --active-tab: #03423d;
 
     font-family: 'Barlow', sans-serif;
     font-size: 14pt;
@@ -79,6 +80,18 @@ header {
     fill: var(--background);
 }
 
+.addingitem {
+    animation-name: cartwiggle;
+    animation-duration: 1s;
+    /* overflow-x: hidden; */
+}
+
+@keyframes cartwiggle {
+    20% { transform: rotate(50deg);}
+    50%{ transform: scale(200%);}
+    80% { transform: rotate(-50deg);}
+}
+
 .homepage, .shopping, .shopping-cart {
     display: none;
 }
@@ -109,6 +122,10 @@ header {
     width: 5em;
     text-align: center;
     cursor: pointer;
+}
+
+.browsebar>*:active{
+    background-color: var(--active-tab);
 }
 
 .primary-banner {
@@ -245,6 +262,25 @@ input[type=number] {
 
 footer {
     font-size: 8pt;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-image: linear-gradient(180deg, var(--accent),
+    var(--background), var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-corner {
+    background: rgba(255, 255, 255, 0);
+    border-radius: 7px;
 }
 
 /* Tablet Display */

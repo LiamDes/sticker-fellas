@@ -26,12 +26,12 @@
                 <nav>
                     <span>Howdy, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}">LOGOUT</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
                 </nav>
                 {% else %}
                 <nav><a href="{% url 'login' %}">LOGIN</a> or
                     <a href="{% url 'accounts:signup' %}">SIGN UP</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping"></a>
+                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
                 </nav>
                 {% endif %}
                 
