@@ -1,5 +1,3 @@
-paypal.Buttons.driver("vue", window.Vue);
-
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -88,7 +86,6 @@ new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
     data: {
-        token: '',
         showHome: true,
         showShop: false,
         showCart: false,
@@ -99,6 +96,8 @@ new Vue({
         buyingNumber: 1,
         activeProduct: [],
         inventory: [],
+        stripeKey: '',
+        stripe: null,
     },
     methods: {
         goHome() {
@@ -144,10 +143,24 @@ new Vue({
                 }).then(res => this.inventory = res.data)
             }
         },
-
+        getStripeKey() {
+            axios.get('/api/getkey/')
+            .then(res => {this.stripeKey = res.data.pub_key, this.stripe = Stripe(res.data.pub_key)})
+        },
+        checkout(cart) {
+            const data = {
+                items: cart
+            }
+            axios.post('/api/stripe/checkoutsession/', data)
+            .then(res => {
+                console.log(res.data)
+                return this.stripe.redirectToCheckout({sessionId: res.data.sessionId})
+            })
+            .catch(err => console.error(err))
+        },
     },
     mounted() {
         this.goHome()
+        this.getStripeKey()
     },
 })
-

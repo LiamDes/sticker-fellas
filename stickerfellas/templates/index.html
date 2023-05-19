@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="{% static 'js/secrets.js' %}"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AUhMRIxcUxDngr22YGQyKHLdYJ5ehSS3EkJzipZD3x2rMRgsMam9GGgbvkZjnvMMj7f0LplIIzehiHFj"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script src="{% static 'js/app.js' %}" defer></script>
     
     <title>{% block title %}STICKER FELLAS - Stickers and More!{% endblock %}</title>
@@ -72,6 +71,24 @@
                 <!-- TODO: refine view of cart -->
                 Your cart :
                 <shopping-cart :cart="shoppingCart"></shopping-cart>
+                <form id="payment-form">
+                    <div id="link-authentication-element">
+                        <!--Stripe.js injects the Link Authentication Element-->
+                    </div>
+                    <div id="payment-element">
+                        <!--Stripe.js injects the Payment Element-->
+                    </div>
+                    <button id="submit">
+                        <div class="spinner hidden" id="spinner"></div>
+                        <span id="button-text">Pay now</span>
+                    </button>
+                    <div id="payment-message" class="hidden"></div>
+                </form>
+
+                <button @click="checkout(shoppingCart)">
+                    Pay now!
+                </button>
+
             </article>
                 
             <article class="shopping" :class="{'fullmenu':showShop}">

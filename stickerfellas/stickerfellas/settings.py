@@ -23,8 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = dotenv_values('.env')
 
-# 'django-insecure-hjakljby=j+m94$)0rs)^h3y7^khf8708w-*+bav0*k!bfvnqh'
+#Stripe
+STRIPE_PUB_KEY = 'pk_test_51N9EumJgrzFtfn7GSLkiuEOB6SbITBNIYblZHf3xNwTNoJNJwHZcWCPlIpCoFOMFcWXTPDaK8s2lPw26AAkQBT5p00OhmJ3MEW'
+STRIPE_SECRET_KEY = 'sk_test_51N9EumJgrzFtfn7GNSxzdC7QO5dPdtMxsIq3CYtmJk6KX67JaN54eNGkmmKCElRGnsdoCtZ1Ejedk9pdgfoQUjM500V6U9uiHc'
+PAYMENT_SUCCESS_URL = 'http://127.0.0.1:8000/complete/'
+PAYMENT_CANCEL_URL = 'http://127.0.0.1:8000/'
 
+#stickers
+PRICE_ID_DOGGY_S = 'price_1N9FsTJgrzFtfn7Gy6NtNvSg'
+#pins
+PRICE_ID_3DOG_P = 'price_1N9FtUJgrzFtfn7GqXO6TlLz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

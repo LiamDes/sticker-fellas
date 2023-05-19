@@ -6,6 +6,12 @@ from products.models import *
 from django.contrib.auth import get_user_model
 from .serializers import *
 
+import json
+from django.conf import settings
+import os
+import stripe
+
+stripe.api_key = 'sk_test_51N9EumJgrzFtfn7GNSxzdC7QO5dPdtMxsIq3CYtmJk6KX67JaN54eNGkmmKCElRGnsdoCtZ1Ejedk9pdgfoQUjM500V6U9uiHc'
 
 class AllInventory(generics.ListAPIView):
     serializer_class = ItemSerializer
@@ -24,4 +30,52 @@ class AllCategory(generics.ListAPIView):
     def get_queryset(self):
         type = self.request.GET.get('type')
         return ListItem.objects.filter(type=type)
+    
+
+@api_view(['POST', 'GET'])
+def test_payment(request):
+    test_payment_intent = stripe.PaymentIntent.create(
+        amount=1000, currency='pln', 
+        payment_method_types=['card'],
+        receipt_email='test@example.com')
+    return Response(data=test_payment_intent)
+
+
+@api_view(['GET'])
+def get_stripe_key(request):
+    pub_key = settings.STRIPE_PUB_KEY
+    return Response({'pub_key': pub_key})
+
+@api_view(['POST'])
+def checkout_session(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    data = json.loads(request.body)
+    items = data['items']
+    print(items)
+
+    price_id = settings.PRICE_ID_DOGGY_S
+
+    if request.user.id:
+        client_id = request.user.id
+    else:
+        client_id = 0
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            client_reference_id = client_id,
+            success_url = '%s?session_id={CHECKOUT_SESSION_ID}' % settings.PAYMENT_SUCCESS_URL,
+            cancel_url = '%s' % settings.PAYMENT_CANCEL_URL,
+            payment_method_types = ['card'],
+            mode = 'payment',
+            line_items = [
+                {
+                    'price': price_id,
+                    'quantity': 1
+                }
+
+            ]
+        )
+        return Response({'sessionId': checkout_session['id']})
+    except Exception as e:
+        return Response({'error': str(e)})
     
