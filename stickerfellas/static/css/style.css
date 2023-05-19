@@ -155,12 +155,43 @@ header {
     height: 300px;
     border-radius: 10px;
 
+    background-image: linear-gradient(180deg, #f1faf8, #8ec0ab);
+    filter: drop-shadow(3px 3px 4px var(--header-text));
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.secondary-ad h3 {
+    background-color: var(--accent);
+    text-align: center;
+    width: 100%;
+    line-height: 3em;
+
+    color: var(--header-text);
+    -webkit-text-stroke: 1px var(--main-text);
+    font-size: 20pt;
+}
+
+.secondary-banner-promo {
+    width: 160px;
+    filter: drop-shadow(3px 3px 4px #00271d);
+}
+
+button {
     background-color: var(--header-text);
+    color: var(--background);
+    border-radius: 4px;
 }
 
 .shop-all {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-around;
 }
 
 .listings {
@@ -236,11 +267,20 @@ footer {
         width: 250px;
     }
 
+    .primary-block {
+        padding-top: 0.4em;
+    }
+
     .secondary-banners {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: unset;
         justify-content: space-around;
+    }
+
+    .secondary-banner-promo:hover {
+        width: 170px;
+        transition: width 0.3s;
     }
 }
 
