@@ -1,5 +1,4 @@
 from django.urls import path
-# from django_paypal import views
 from .views import *
 
 appname = 'api'

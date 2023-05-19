@@ -1,14 +1,10 @@
 from rest_framework import generics
-from django.shortcuts import render, HttpResponse, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from products.models import *
 from django.contrib.auth import get_user_model
 from .serializers import *
-
-import json
 from django.conf import settings
-import os
 import stripe
 
 stripe.api_key = 'sk_test_51N9EumJgrzFtfn7GNSxzdC7QO5dPdtMxsIq3CYtmJk6KX67JaN54eNGkmmKCElRGnsdoCtZ1Ejedk9pdgfoQUjM500V6U9uiHc'
@@ -41,13 +37,11 @@ def get_stripe_key(request):
 @api_view(['POST'])
 def checkout_session(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    # data = json.loads(request.body)
     data = request.data
     items = data['items']
     full_cart = []
 
     for index in range(len(items)):
-        print(f'This order is for {items[index]["quantity"]} of {items[index]["product"]["name"]}')
         full_cart.append({"price":items[index]["product"]["price_id"], "quantity":items[index]["quantity"]})
 
     if request.user.id:
