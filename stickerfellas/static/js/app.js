@@ -68,6 +68,28 @@ Vue.component('ShoppingCart', {
     }
 })
 
+Vue.component('CompleteOrder', {
+    template: `
+    <div id="complete-message">
+        <h3>Thank you for your order, [[orderInfo.name]]!</h3>
+        <p>Order for [[orderInfo.email]]</p>
+    </div>`,
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            orderInfo: {}
+        }
+    },
+    methods: {
+        getOrderDetails() {
+            axios.get(`http://127.0.0.1:8000/api/stripe/complete/`).then(res => this.orderInfo = res.data)
+        }
+    },
+    mounted() {
+        this.getOrderDetails()
+    }
+})
+
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],

@@ -7,5 +7,6 @@ urlpatterns = [
     path('product/<int:pk>/', ItemDetail.as_view()),
     path('type/', AllCategory.as_view()),
     path('getkey/', get_stripe_key),
-    path('stripe/checkoutsession/', checkout_session)
+    path('stripe/checkoutsession/', checkout_session),
+    path('stripe/complete/', order_success)
 ]
