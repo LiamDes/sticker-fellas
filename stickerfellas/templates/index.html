@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="{% static 'js/secrets.js' %}"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AUhMRIxcUxDngr22YGQyKHLdYJ5ehSS3EkJzipZD3x2rMRgsMam9GGgbvkZjnvMMj7f0LplIIzehiHFj"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script src="{% static 'js/app.js' %}" defer></script>
     
     <title>{% block title %}STICKER FELLAS - Stickers and More!{% endblock %}</title>
@@ -20,6 +19,7 @@
 
 <body>
     <div id="app">
+        {% csrf_token %}
         <header>
             <nav class="accounts">
                 {% if user.is_authenticated %}
@@ -36,7 +36,9 @@
                 {% endif %}
                 
             </nav>
+            {% block homedirect %}
             <h1 @click="goHome">STICKER FELLAS</h1>
+            {% endblock %}
             <div class="headerwaves">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
@@ -46,12 +48,14 @@
             </div>
         </header>
 
+        {% block navbar %}
         <nav class="contents browsebar">
             <div @click="openShop(null)">SHOP ALL</div>
             <div @click="openShop('S')">STICKERS</div>
             <div @click="openShop('P')">PINS</div>
             <div @click="openShop('H')">HATS</div> 
         </nav>
+        {% endblock %}
 
         <main class="contents">
 
@@ -72,6 +76,10 @@
                 <!-- TODO: refine view of cart -->
                 Your cart :
                 <shopping-cart :cart="shoppingCart"></shopping-cart>
+                <button @click="checkout(shoppingCart)">
+                    Pay now!
+                </button>
+
             </article>
                 
             <article class="shopping" :class="{'fullmenu':showShop}">
