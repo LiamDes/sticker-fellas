@@ -63,13 +63,3 @@ def checkout_session(request):
     except Exception as e:
         return Response({'error': str(e)})
     
-
-@api_view(['GET'])
-def order_success(request):
-    data = request.data
-    session = stripe.checkout.Session.retrieve('cs_test_a1tz39wSa2mUeAm5XkyyKKhDI7S3F29awaPMqR0Mg3aQnsjd4VIJIApcwC')
-    customer = session["customer_details"]["name"]
-    email = session["customer_details"]["email"]
-    # customer = stripe.Customer.retrieve(session.customer)
-    # return Response({'sessionId': session, 'customer': customer})
-    return Response({'name': customer, 'email': email})

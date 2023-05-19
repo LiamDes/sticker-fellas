@@ -2,8 +2,17 @@
 
 {% block title %}Payment Complete!{% endblock %}
 
+{% block homedirect %}
+    <h1><a href="{% url 'home' %}" class="homedirect">STICKER FELLAS</a></h1>
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
 {% block content %}
 
-    <complete-order></complete-order>
+    <h3>Thank you for your order, {{info.customer_details.name}}!</h3>
+
+    <p>Order for {{ info.customer_details.email }}</p>
 
 {% endblock %}
