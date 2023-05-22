@@ -48,12 +48,18 @@ Vue.component('ShoppingCart', {
     template: `
     <div>
         <div v-for="item in cart" class="cart-item">
-            <h4>[[item.product.name]]</h4> <i class="fa-solid fa-delete-left delete-item"></i>
-            <p>[[item.price]]</p>
+            <h4>[[item.product.name]]
+                <span v-if="item.product.type === 'S'"> Sticker</span>
+                <span v-else-if="item.product.type === 'P'"> Pin</span>
+                <span v-else> Hat</span>
+            </h4>
+            <i class="fa-solid fa-delete-left delete-item" @click="deleteFromCart(item)"></i>
+            <p>[[item.price]] <em v-if="item.quantity > 1">at [[item.product.price]] each</em></p>
             <span class="edit-item">
-                <i class="fa-solid fa-minus edit-button"></i>
+                <i class="fa-solid fa-minus edit-button" @click="quantityDown(item)" v-if="item.quantity > 1"></i>
+                <i class="fa-solid fa-minus edit-null" v-else></i>
                 <span class="quantity-display">[[item.quantity]]</span>
-                <i class="fa-solid fa-plus edit-button"></i>
+                <i class="fa-solid fa-plus edit-button" @click="quantityUp(item)"></i>
             </span>
         </div>
         <h4> TOTAL: $[[orderSum]] </h4>
@@ -75,6 +81,29 @@ Vue.component('ShoppingCart', {
                 this.totalPrice = sum.toFixed(2)
             })
             return this.totalPrice
+        }
+    },
+    methods: {
+        quantityUp(product) {
+            product.quantity ++
+            let newCost = product.product.price * product.quantity
+            product.price = newCost.toFixed(2)
+        },
+        quantityDown(product) {
+            product.quantity --
+            let newCost = product.product.price * product.quantity
+            product.price = newCost.toFixed(2)
+            // order sum only recomputes when the outer price value changes, must prompt in +/-
+        },
+        deleteFromCart(product) {
+            const index = this.cart.indexOf(product)
+            if (index !== -1) {
+                this.cart.splice(index, 1)
+            }
+            if (this.cart.length === 0) {
+                this.totalPrice = 0
+            // total price will not compute on empty cart; must be set manually.
+            }
         }
     }
 })

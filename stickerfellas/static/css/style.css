@@ -252,6 +252,7 @@ input[type=number] {
 
 .cart-item {
     background-color: #f1faf8;
+    font-variant-numeric: tabular-nums;
     border-radius: 3px;
     margin: 0.4em 0;
     padding: 0.3em;
@@ -271,6 +272,7 @@ input[type=number] {
 .delete-item {
     grid-area: delete;
     margin-top: 1em;
+    color: var(--header-text)
 }
 
 .delete-item::before {
@@ -284,7 +286,8 @@ input[type=number] {
 }
 
 .quantity-display {
-    padding: 0 1em 0 1em;
+    padding: 0 1em;
+    /* font-variant-numeric: tabular-nums; */
 }
 
 .edit-item {
@@ -294,6 +297,11 @@ input[type=number] {
 
 .edit-button {
     cursor: pointer;
+    color: var(--header-text)
+}
+
+.edit-null {
+    opacity: 0.5;
 }
 
 .order-details {
