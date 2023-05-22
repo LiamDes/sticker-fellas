@@ -83,7 +83,6 @@
             </article>
 
             <article class="shopping-cart" :class="{'fullmenu':showCart}">
-                <!-- TODO: refine view of cart -->
                 Your cart :
                 <shopping-cart :cart="shoppingCart"></shopping-cart>
                 <button @click="checkout(shoppingCart)">
@@ -116,6 +115,7 @@
                         <input type="number" id="quantity" min="1" default="1" :max="activeProduct.inventory" v-model="buyingNumber">
                         <button @click="addToCart(buyingNumber)">Add to Cart</button>
                     </section>
+                    <div v-if="stockError">All stock of this product is claimed in a cart.</div>
                 </section>
             </article>
             {% endblock %}

@@ -8,10 +8,11 @@ Vue.component('CheckoutComplete', {
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
-    @click="openProduct(listing.id)">
+    @click="openProduct(listing.id)" :class="{out: isOut}">
+        <div v-if="isOut" class="stock-notice">SOLD OUT</div>
         <h3>[[listing.name]]</h3>
         <img :src="listing.image" class="itempreview"/>
-        <button v-if="hovering" @click.stop="cartFromPreview">Add to Cart</button>
+        <button v-if="hovering && !isOut" @click.stop="cartFromPreview">Add to Cart</button>
     </div>`,
     props: {
         listing: Object,
@@ -19,7 +20,7 @@ Vue.component('ItemListings', {
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            hovering: false,
+            hovering: false
         }
     },
     methods: {
@@ -56,6 +57,12 @@ Vue.component('ItemListings', {
             this.$parent.showCart = false
             this.$parent.showProduct = true
         },
+    },
+    computed: {
+        isOut() {
+            if (this.listing.inventory === 0) return true
+            else return false
+        }
     }
 })
 
@@ -129,6 +136,7 @@ Vue.component('ShoppingCart', {
         },
         deleteFromCart(product) {
             let newStock = product.product.inventory + parseInt(product.quantity)
+
             axios.patch(`/api/product/${product.product.id}/`,
             { "inventory": newStock },
             { headers: { 'X-CSRFToken': this.$parent.token } }
@@ -169,6 +177,7 @@ new Vue({
         stripeKey: '',
         token: '',
         stripe: null,
+        stockError: false,
     },
     methods: {
         goHome() {
@@ -192,39 +201,49 @@ new Vue({
             this.showProduct = false
         },
         addToCart(quantity) {
-            this.addingToCart = true
-            setTimeout(() => {
-                this.addingToCart = false
-            }, 1000)
+            if (quantity <= this.activeProduct.inventory) {
+                this.addingToCart = true
+                setTimeout(() => {
+                    this.addingToCart = false
+                }, 1000)
 
-            let newStock = this.activeProduct.inventory - parseInt(this.buyingNumber)
-            axios.patch(`/api/product/${this.activeProduct.id}/`,
-            { "inventory": newStock },
-            { headers: { 'X-CSRFToken': this.token } }
-            ).then(response => {
-                this.activeProduct = response.data
+                let newStock = this.activeProduct.inventory - parseInt(this.buyingNumber)
+                axios.patch(`/api/product/${this.activeProduct.id}/`,
+                    { "inventory": newStock },
+                    { headers: { 'X-CSRFToken': this.token } }
+                    ).then(response => {
+                        this.activeProduct = response.data
 
-                this.shoppingCart.forEach(listing => {
-                    if (listing.product.id === this.activeProduct.id) {this.newItem = false}
-                })
-                if (this.newItem) {
-                    this.shoppingCart.push( {quantity: quantity, product: this.activeProduct, price: (quantity * this.activeProduct.price).toFixed(2)})
-                } else {
-                    let match = this.shoppingCart.find(product => product.product.id === this.activeProduct.id)
-                    match.quantity = parseInt(match.quantity) + parseInt(quantity)
-                    match.price = (match.quantity * match.product.price).toFixed(2)
-                }
+                        this.shoppingCart.forEach(listing => {
+                            if (listing.product.id === this.activeProduct.id) {this.newItem = false}
+                        })
+                        if (this.newItem) {
+                            this.shoppingCart.push( {quantity: quantity, product: this.activeProduct, price: (quantity * this.activeProduct.price).toFixed(2)})
+                        } else {
+                            let match = this.shoppingCart.find(product => product.product.id === this.activeProduct.id)
+                            match.quantity = parseInt(match.quantity) + parseInt(quantity)
+                            match.price = (match.quantity * match.product.price).toFixed(2)
+                            match.product.inventory = this.activeProduct.inventory
+                        }
 
-                this.buyingNumber = 1
-                this.newItem = true
-                this.saveCart(this.shoppingCart)
-            })
+                        this.buyingNumber = 1
+                        this.newItem = true
+                        this.saveCart(this.shoppingCart)
+                    })
+            } else {
+                this.stockError = true
+                setTimeout(() => {
+                    this.stockError = false
+                }, 2000)
+            }
+
+            
         },
         getProducts(sort) {
             if (sort === null) {
                 axios.get('/api/all/').then(res => this.inventory = res.data)
             } else if (sort === 'lowstock') {
-                axios.get('/api/all/').then(res => this.inventory = res.data.filter(item => item.inventory < 15))
+                axios.get('/api/all/').then(res => this.inventory = res.data.filter(item => item.inventory < 15 && item.inventory > 0))
             }else {
                 axios.get('/api/type/', {
                     params: { type: sort }
