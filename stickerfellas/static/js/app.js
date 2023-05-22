@@ -29,18 +29,25 @@ Vue.component('ItemListings', {
                 this.$parent.addingToCart = false
             }, 1000)
 
-            this.$parent.shoppingCart.forEach(listing => {
-                if (listing.product.id === this.listing.id) {this.$parent.newItem = false}
+            this.listing.inventory --
+
+            axios.patch(`/api/product/${this.listing.id}/`,
+            { "inventory": this.listing.inventory },
+            { headers: { 'X-CSRFToken': this.$parent.token } }
+            ).then(res => { 
+                this.$parent.shoppingCart.forEach(listing => {
+                    if (listing.product.id === this.listing.id) {this.$parent.newItem = false}
+                })
+                if (this.$parent.newItem) {
+                    this.$parent.shoppingCart.push({quantity: 1, product: this.listing, price: this.listing.price})
+                } else {
+                    let match = this.$parent.shoppingCart.find(product => product.product.id === this.listing.id)
+                    match.quantity = parseInt(match.quantity) + 1
+                    match.price = (match.quantity * match.product.price).toFixed(2)
+                }
+                this.$parent.newItem = true
+                this.$parent.saveCart(this.$parent.shoppingCart)
             })
-            if (this.$parent.newItem) {
-                this.$parent.shoppingCart.push({quantity: 1, product: this.listing, price: this.listing.price})
-            } else {
-                let match = this.$parent.shoppingCart.find(product => product.product.id === this.listing.id)
-                match.quantity = parseInt(match.quantity) + 1
-                match.price = (match.quantity * match.product.price).toFixed(2)
-            }
-            this.$parent.newItem = true
-            this.$parent.saveCart(this.$parent.shoppingCart)
         },
         openProduct(itemID) {
             axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
@@ -128,7 +135,7 @@ Vue.component('ShoppingCart', {
                 this.activeProduct = response.data
                 this.buyingNumber = 1
                 this.newItem = true
-                
+
                 const index = this.cart.indexOf(product)
                 if (index !== -1) {
                     this.cart.splice(index, 1)
