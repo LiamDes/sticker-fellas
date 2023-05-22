@@ -110,9 +110,10 @@
                     <img :src="activeProduct.image" alt="image of product"/>
                     <div class="price">[[activeProduct.price]]</div>
                     <caption>[[activeProduct.description]]</caption>
+                    <div class="price">[[activeProduct.inventory]] in Stock!</div>
                     <section class="buying">
                         <label for="quantity">Quantity:</label>
-                        <input type="number" id="quantity" min="1" default="1" v-model="buyingNumber">
+                        <input type="number" id="quantity" min="1" default="1" :max="activeProduct.inventory" v-model="buyingNumber">
                         <button @click="addToCart(buyingNumber)">Add to Cart</button>
                     </section>
                 </section>
