@@ -74,7 +74,8 @@ Vue.component('ShoppingCart', {
                 <i class="fa-solid fa-minus edit-button" @click="quantityDown(item)" v-if="item.quantity > 1"></i>
                 <i class="fa-solid fa-minus edit-null" v-else></i>
                 <span class="quantity-display">[[item.quantity]]</span>
-                <i class="fa-solid fa-plus edit-button" @click="quantityUp(item)"></i>
+                <i class="fa-solid fa-plus edit-button" @click="quantityUp(item)" v-if="item.product.inventory > 0"></i>
+                <i class="fa-solid fa-plus edit-null" v-else></i>
             </span>
         </div>
         <h4> TOTAL: $[[orderSum]] </h4>
