@@ -1,3 +1,10 @@
+Vue.component('CheckoutComplete', {
+    template: `<div class="hidden"></div>`,
+    mounted() {
+        localStorage.clear()
+    }
+})
+
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -33,6 +40,7 @@ Vue.component('ItemListings', {
                 match.price = (match.quantity * match.product.price).toFixed(2)
             }
             this.$parent.newItem = true
+            this.$parent.saveCart(this.$parent.shoppingCart)
         },
         openProduct(itemID) {
             axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
@@ -47,10 +55,22 @@ Vue.component('ItemListings', {
 Vue.component('ShoppingCart', {
     template: `
     <div>
-        <div v-for="item in cart">
-            <strong>[[item.product.name]]</strong> x[[item.quantity]] ([[item.price]])
+        <div v-for="item in cart" class="cart-item">
+            <h4>[[item.product.name]]
+                <span v-if="item.product.type === 'S'"> Sticker</span>
+                <span v-else-if="item.product.type === 'P'"> Pin</span>
+                <span v-else> Hat</span>
+            </h4>
+            <i class="fa-solid fa-delete-left delete-item" @click="deleteFromCart(item)"></i>
+            <p>[[item.price]] <em v-if="item.quantity > 1">at [[item.product.price]] each</em></p>
+            <span class="edit-item">
+                <i class="fa-solid fa-minus edit-button" @click="quantityDown(item)" v-if="item.quantity > 1"></i>
+                <i class="fa-solid fa-minus edit-null" v-else></i>
+                <span class="quantity-display">[[item.quantity]]</span>
+                <i class="fa-solid fa-plus edit-button" @click="quantityUp(item)"></i>
+            </span>
         </div>
-        <span> TOTAL: $[[orderSum]] </span>
+        <h4> TOTAL: $[[orderSum]] </h4>
     </div>`,
     props: {
         cart: Array,
@@ -69,6 +89,32 @@ Vue.component('ShoppingCart', {
                 this.totalPrice = sum.toFixed(2)
             })
             return this.totalPrice
+        }
+    },
+    methods: {
+        quantityUp(product) {
+            product.quantity ++
+            let newCost = product.product.price * product.quantity
+            product.price = newCost.toFixed(2)
+            this.$parent.saveCart(this.cart)
+        },
+        quantityDown(product) {
+            product.quantity --
+            let newCost = product.product.price * product.quantity
+            product.price = newCost.toFixed(2)
+            // order sum only recomputes when the outer price value changes, must prompt in +/-
+            this.$parent.saveCart(this.cart)
+        },
+        deleteFromCart(product) {
+            const index = this.cart.indexOf(product)
+            if (index !== -1) {
+                this.cart.splice(index, 1)
+            }
+            if (this.cart.length === 0) {
+                this.totalPrice = 0
+            // total price will not compute on empty cart; must be set manually.
+            }
+            this.$parent.saveCart(this.cart)
         }
     }
 })
@@ -131,6 +177,8 @@ new Vue({
             this.openShop(this.activeProduct.type)
             this.buyingNumber = 1
             this.newItem = true
+
+            this.saveCart(this.shoppingCart)
         },
         getProducts(sort) {
             if (sort === null) {
@@ -151,11 +199,13 @@ new Vue({
             }
             axios.post('/api/stripe/checkoutsession/', data, { headers: { 'X-CSRFToken': this.token } })
             .then(res => {
-                console.log(res.data)
                 return this.stripe.redirectToCheckout({sessionId: res.data.sessionId})
             })
             .catch(err => console.error(err))
         },
+        saveCart(userCart) {
+            localStorage.setItem('cart', JSON.stringify(userCart));
+        }
     },
     computed: {
         cartQuantity() {
@@ -173,5 +223,7 @@ new Vue({
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value
         this.getStripeKey()
         this.goHome()
+        const cartData = localStorage.getItem('cart');
+        this.shoppingCart = cartData ? JSON.parse(cartData) : [];
     },
 })
