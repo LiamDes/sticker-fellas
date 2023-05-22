@@ -1,3 +1,10 @@
+Vue.component('CheckoutComplete', {
+    template: `<div class="hidden"></div>`,
+    mounted() {
+        localStorage.clear()
+    }
+})
+
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -33,6 +40,7 @@ Vue.component('ItemListings', {
                 match.price = (match.quantity * match.product.price).toFixed(2)
             }
             this.$parent.newItem = true
+            this.$parent.saveCart(this.$parent.shoppingCart)
         },
         openProduct(itemID) {
             axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
@@ -88,12 +96,14 @@ Vue.component('ShoppingCart', {
             product.quantity ++
             let newCost = product.product.price * product.quantity
             product.price = newCost.toFixed(2)
+            this.$parent.saveCart(this.cart)
         },
         quantityDown(product) {
             product.quantity --
             let newCost = product.product.price * product.quantity
             product.price = newCost.toFixed(2)
             // order sum only recomputes when the outer price value changes, must prompt in +/-
+            this.$parent.saveCart(this.cart)
         },
         deleteFromCart(product) {
             const index = this.cart.indexOf(product)
@@ -104,6 +114,7 @@ Vue.component('ShoppingCart', {
                 this.totalPrice = 0
             // total price will not compute on empty cart; must be set manually.
             }
+            this.$parent.saveCart(this.cart)
         }
     }
 })
@@ -166,6 +177,8 @@ new Vue({
             this.openShop(this.activeProduct.type)
             this.buyingNumber = 1
             this.newItem = true
+
+            this.saveCart(this.shoppingCart)
         },
         getProducts(sort) {
             if (sort === null) {
@@ -186,11 +199,13 @@ new Vue({
             }
             axios.post('/api/stripe/checkoutsession/', data, { headers: { 'X-CSRFToken': this.token } })
             .then(res => {
-                console.log(res.data)
                 return this.stripe.redirectToCheckout({sessionId: res.data.sessionId})
             })
             .catch(err => console.error(err))
         },
+        saveCart(userCart) {
+            localStorage.setItem('cart', JSON.stringify(userCart));
+        }
     },
     computed: {
         cartQuantity() {
@@ -208,5 +223,7 @@ new Vue({
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value
         this.getStripeKey()
         this.goHome()
+        const cartData = localStorage.getItem('cart');
+        this.shoppingCart = cartData ? JSON.parse(cartData) : [];
     },
 })
