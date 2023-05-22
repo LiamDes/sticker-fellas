@@ -250,6 +250,52 @@ input[type=number] {
     width: 3em;
 }
 
+.cart-item {
+    background-color: #f1faf8;
+    border-radius: 3px;
+    margin: 0.4em 0;
+    padding: 0.3em;
+    display: grid;
+    grid-template-areas: 
+        'name delete'
+        'price price'
+        'quantity quantity';
+    grid-template-columns: auto min-content;
+}
+
+.cart-item h4 {
+    grid-area: name;
+    margin-top: 0.3em;
+}
+
+.delete-item {
+    grid-area: delete;
+    margin-top: 1em;
+}
+
+.delete-item::before {
+    cursor: pointer;
+}
+
+.cart-item p {
+    grid-area: price;
+    margin: 0 0 0.4em 0;
+    padding-left: 0.4em;
+}
+
+.quantity-display {
+    padding: 0 1em 0 1em;
+}
+
+.edit-item {
+    grid-area: quantity;
+    padding-left: 1em;
+}
+
+.edit-button {
+    cursor: pointer;
+}
+
 .order-details {
     word-wrap: break-word;
     text-align: center;

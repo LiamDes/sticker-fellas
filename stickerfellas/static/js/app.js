@@ -47,10 +47,16 @@ Vue.component('ItemListings', {
 Vue.component('ShoppingCart', {
     template: `
     <div>
-        <div v-for="item in cart">
-            <strong>[[item.product.name]]</strong> x[[item.quantity]] ([[item.price]])
+        <div v-for="item in cart" class="cart-item">
+            <h4>[[item.product.name]]</h4> <i class="fa-solid fa-delete-left delete-item"></i>
+            <p>[[item.price]]</p>
+            <span class="edit-item">
+                <i class="fa-solid fa-minus edit-button"></i>
+                <span class="quantity-display">[[item.quantity]]</span>
+                <i class="fa-solid fa-plus edit-button"></i>
+            </span>
         </div>
-        <span> TOTAL: $[[orderSum]] </span>
+        <h4> TOTAL: $[[orderSum]] </h4>
     </div>`,
     props: {
         cart: Array,
