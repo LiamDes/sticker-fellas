@@ -80,10 +80,13 @@ header {
     fill: var(--background);
 }
 
+.fa-cart-shopping {
+    cursor: pointer;
+}
+
 .addingitem {
     animation-name: cartwiggle;
     animation-duration: 1s;
-    /* overflow-x: hidden; */
 }
 
 @keyframes cartwiggle {
@@ -232,13 +235,21 @@ button {
 }
 
 .single-item {
-    text-align: center;
-
     background-color: var(--background);
     border: 3px solid var(--accent);
     border-radius: 10px;
     margin: 1.3em;
     padding: 0.6em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.close-active {
+    align-self: flex-end;
+    color: var(--header-text);
+    cursor: pointer;
 }
 
 .price {

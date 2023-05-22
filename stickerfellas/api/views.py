@@ -14,7 +14,7 @@ class AllInventory(generics.ListAPIView):
     queryset = ListItem.objects.all().reverse()
 
 
-class ItemDetail(generics.RetrieveAPIView):
+class ItemDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ItemSerializer
 
     def get_queryset(self):
