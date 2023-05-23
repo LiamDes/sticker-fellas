@@ -1,6 +1,6 @@
 {% extends 'index.html' %}
 
-{% block title %}Signup{% endblock %}
+{% block title %}404 - Sticker Fellas{% endblock %}
 
 {% block homedirect %}
     <h1><a href="{% url 'home' %}" class="homedirect">STICKER FELLAS</a></h1>
@@ -12,12 +12,7 @@
 {% endblock %}
 
 {% block content %}
-
-<h2>Sign up</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Sign up">
-</form>
-
+    <div class="error-page">
+        <h2><i class="fa-solid fa-triangle-exclamation"></i> 404 <i class="fa-solid fa-triangle-exclamation"></i></h2>
+    </div>
 {% endblock %}

@@ -13,7 +13,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('complete/', include('complete.urls')),
-    path('error/', TemplateView.as_view(template_name='order_error.html'), name='error'),
+    path('error/', TemplateView.as_view(template_name='404.html'), name='error'),
 ]
 
 if settings.DEBUG: 

@@ -22,19 +22,18 @@
         {% csrf_token %}
         <header>
             <nav class="accounts">
-                {% if user.is_authenticated %}
                 <nav>
+                {% if user.is_authenticated %}
                     <span>Howdy, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}">LOGOUT</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
-                </nav>
                 {% else %}
-                <nav><a href="{% url 'login' %}">LOGIN</a> or
+                    <a href="{% url 'login' %}">LOGIN</a> or
                     <a href="{% url 'accounts:signup' %}">SIGN UP</a>
-                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
-                </nav>
                 {% endif %}
-                
+                    {% block cart %}
+                    <a @click="openCart" class="fa-solid fa-cart-shopping" :class="{addingitem: addingToCart}"></a>[[cartQuantity]]
+                    {% endblock %}
+                </nav>
             </nav>
             {% block homedirect %}
             <h1 @click="goHome">STICKER FELLAS</h1>

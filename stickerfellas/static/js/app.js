@@ -250,6 +250,15 @@ new Vue({
                 }).then(res => this.inventory = res.data)
             }
         },
+        productFromLaunch(productId) {
+            axios.get(`/api/product/${productId}`).then(res => this.activeProduct = res.data)
+            .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
+            this.lastFilter = null
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = true
+        },
         getStripeKey() {
             axios.get('/api/getkey/')
             .then(res => {this.stripeKey = res.data.pub_key, this.stripe = Stripe(res.data.pub_key)})
@@ -266,7 +275,7 @@ new Vue({
         },
         saveCart(userCart) {
             localStorage.setItem('cart', JSON.stringify(userCart));
-        }
+        },
     },
     computed: {
         cartQuantity() {
@@ -283,8 +292,14 @@ new Vue({
     mounted() {
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value
         this.getStripeKey()
-        this.goHome()
         const cartData = localStorage.getItem('cart');
         this.shoppingCart = cartData ? JSON.parse(cartData) : [];
+
+        const url = new URL(window.location.href)
+        if (url.searchParams.has('product')) {
+            let params = window.location.href.split('?')
+            let productMatch = params[1].match(/(?<=product=)\d+(?=&|)/)
+            this.productFromLaunch(productMatch[0])
+        }
     },
 })
