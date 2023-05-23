@@ -5,6 +5,61 @@ Vue.component('CheckoutComplete', {
     }
 })
 
+Vue.component('ProductReviews', {
+    template: 
+        `<div>
+            <div v-for="review in reviews" class="review-contents">
+                <h3>
+                    [[review.title]] 
+                    <span v-for="star in review.rating">
+                        <i class="fa-solid fa-star"></i>
+                    </span>
+                    <span v-for="star in (5 - review.rating)">
+                        <i class="fa-regular fa-star"></i>
+                    </span>
+                </h3>
+                <cite>by [[review.user]]</cite>
+                <p v-if="review.description">[[review.description]]</p>
+            </div>
+            <div v-if="reviews.length === 0" class="review-contents">
+                No reviews for this product yet! Be the first to add one. ☺
+            </div>
+            <div class="review-contents">
+                make a review HERE
+                <button @click="submitReview">SEND</button>
+            </div>
+        </div>`,
+    props: {
+        listing: Object
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            reviews: []
+        }
+    },
+    methods: {
+        getReviews() {
+            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data)
+        },
+        submitReview() {
+            console.log('Thanks :)')
+        }
+    },
+    watch: { 
+        listing() {
+          this.getReviews()
+        }
+    },
+    mounted() {
+        this.getReviews()
+    }
+})
+
+// Vue.component('MakeReview', {
+
+// })
+
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -181,7 +236,7 @@ new Vue({
         buyingNumber: 1,
         addingToCart: false,
         copying: false,
-        activeProduct: [],
+        activeProduct: {},
         inventory: [],
         stripeKey: '',
         token: '',

@@ -96,7 +96,7 @@ header {
     80% { transform: rotate(-50deg);}
 }
 
-.homepage, .shopping, .shopping-cart {
+.homepage, .shopping, .shopping-cart, .reviews {
     display: none;
 }
 
@@ -264,6 +264,13 @@ button {
     align-items: center;
 
     position: relative;
+}
+
+.review-contents {
+    border: 3px solid var(--accent);
+    border-radius: 10px;
+    margin: 0 1em 1em 1em;
+    padding: 0.6em;
 }
 
 .item-actions {

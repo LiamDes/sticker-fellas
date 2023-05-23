@@ -112,6 +112,9 @@
                     <img :src="activeProduct.image" alt="image of product"/>
                     <div class="price">[[activeProduct.price]]</div>
                     <caption>[[activeProduct.description]]</caption>
+                    <p v-if="activeProduct.average_rating != 0">
+                        Rating: [[activeProduct.average_rating]]/5
+                    </p>
                     <div class="price">[[activeProduct.inventory]] in Stock!</div>
                     <section class="buying">
                         <label for="quantity">Quantity:</label>
@@ -120,6 +123,11 @@
                     </section>
                     <div v-if="stockError" :class="{outmessage: stockError}">All stock of this product is currently claimed.</div>
                 </section>
+            </article>
+
+            <article class="reviews" :class="{'fullmenu':showProduct}">
+                <h1>Reviews:</h1>
+                <product-reviews v-if="Object.keys(activeProduct).length > 0" :listing="activeProduct"></product-reviews>
             </article>
             {% endblock %}
         </main>
