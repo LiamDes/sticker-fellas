@@ -172,6 +172,7 @@ new Vue({
         shoppingCart: [],
         buyingNumber: 1,
         addingToCart: false,
+        copying: false,
         activeProduct: [],
         inventory: [],
         stripeKey: '',
@@ -199,6 +200,17 @@ new Vue({
             this.showShop = false
             this.showCart = true
             this.showProduct = false
+        },
+        async copyLink(productId) {
+            const base = new URL(window.location.href)
+            const productLink = `${base.origin}/?product=${productId}`
+            try {
+                await navigator.clipboard.writeText(productLink)
+                this.copying = true
+                setTimeout(() => {this.copying = false}, 800)
+            } catch(err) {
+                alert('PROBLEM ALERT!!!')
+            }
         },
         addToCart(quantity) {
             if (quantity <= this.activeProduct.inventory) {

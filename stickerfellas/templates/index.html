@@ -103,7 +103,11 @@
 
             <article class="shopping" :class="{'fullmenu':showProduct}">
                 <section class="single-item">
-                    <i class="fa-solid fa-xmark close-active" @click="openShop(lastFilter)"></i>
+                    <div class="item-actions">
+                        <i class="fa-solid fa-bookmark" @click="copyLink(activeProduct.id)"></i>
+                        <div v-if="copying" class="copy-message">Link Copied!</div>
+                        <i class="fa-solid fa-xmark" @click="openShop(lastFilter)"></i>
+                    </div>
                     <h1>[[activeProduct.name]]</h1>
                     <img :src="activeProduct.image" alt="image of product"/>
                     <div class="price">[[activeProduct.price]]</div>
@@ -114,7 +118,7 @@
                         <input type="number" id="quantity" min="1" default="1" :max="activeProduct.inventory" v-model="buyingNumber">
                         <button @click="addToCart(buyingNumber)">Add to Cart</button>
                     </section>
-                    <div v-if="stockError">All stock of this product is claimed in a cart.</div>
+                    <div v-if="stockError" :class="{outmessage: stockError}">All stock of this product is currently claimed.</div>
                 </section>
             </article>
             {% endblock %}
