@@ -70,7 +70,8 @@ Vue.component('ShoppingCart', {
     template: `
     <div>
         <div v-for="item in cart" class="cart-item">
-            <h4>[[item.product.name]]
+            <h4 @click="toItem(item.product)">
+                [[item.product.name]]
                 <span v-if="item.product.type === 'S'"> Sticker</span>
                 <span v-else-if="item.product.type === 'P'"> Pin</span>
                 <span v-else> Hat</span>
@@ -107,6 +108,13 @@ Vue.component('ShoppingCart', {
         }
     },
     methods: {
+        toItem(product) {
+            axios.get(`/api/product/${product.id}`).then(res => this.$parent.activeProduct = res.data)
+            this.$parent.showHome = false
+            this.$parent.showShop = false
+            this.$parent.showCart = false
+            this.$parent.showProduct = true
+        },
         quantityUp(product) {
             product.quantity ++
             product.product.inventory --
@@ -209,7 +217,7 @@ new Vue({
                 this.copying = true
                 setTimeout(() => {this.copying = false}, 800)
             } catch(err) {
-                alert('PROBLEM ALERT!!!')
+                alert('There was a problem copying the link- try again in a moment.')
             }
         },
         addToCart(quantity) {

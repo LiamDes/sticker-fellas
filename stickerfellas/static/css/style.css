@@ -334,6 +334,7 @@ input[type=number] {
 .cart-item h4 {
     grid-area: name;
     margin-top: 0.3em;
+    cursor: pointer;
 }
 
 .delete-item {
