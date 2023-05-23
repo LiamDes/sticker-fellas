@@ -8,6 +8,7 @@
     --main-text: #0b2b49;
     --header-text: #0e8178;
     --active-tab: #03423d;
+    --error: #772727;
 
     font-family: 'Barlow', sans-serif;
     font-size: 14pt;
@@ -261,12 +262,50 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    position: relative;
 }
 
-.close-active {
-    align-self: flex-end;
+.item-actions {
+    align-self: stretch;
+    display: flex;
+    justify-content: space-between;
     color: var(--header-text);
     cursor: pointer;
+    position: relative;
+}
+
+@keyframes fade {
+    0% {opacity: 0;}
+    20% {opacity: 1;}
+    80% {opacity: 1;}
+    100% {opacity: 0;}
+  }
+
+.copy-message {
+    background-color: var(--active-tab);
+    color: var(--background);
+    padding: 0.2em 0.4em;
+    border: 1px solid var(--background);
+    border-radius: 4px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    animation-name: fade;
+    animation-duration: 800ms;
+}
+
+.outmessage {
+    background-color: var(--error);
+    color: var(--accent);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 0;
+
+    animation-name: fade;
+    animation-duration: 2200ms;
 }
 
 .price {
@@ -295,6 +334,7 @@ input[type=number] {
 .cart-item h4 {
     grid-area: name;
     margin-top: 0.3em;
+    cursor: pointer;
 }
 
 .delete-item {
@@ -340,6 +380,10 @@ input[type=number] {
 .order-details ul {
     list-style-type: none;
     padding: 0;
+}
+
+.error-page {
+    text-align: center;
 }
 
 footer {

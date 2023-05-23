@@ -70,7 +70,8 @@ Vue.component('ShoppingCart', {
     template: `
     <div>
         <div v-for="item in cart" class="cart-item">
-            <h4>[[item.product.name]]
+            <h4 @click="toItem(item.product)">
+                [[item.product.name]]
                 <span v-if="item.product.type === 'S'"> Sticker</span>
                 <span v-else-if="item.product.type === 'P'"> Pin</span>
                 <span v-else> Hat</span>
@@ -107,6 +108,13 @@ Vue.component('ShoppingCart', {
         }
     },
     methods: {
+        toItem(product) {
+            axios.get(`/api/product/${product.id}`).then(res => this.$parent.activeProduct = res.data)
+            this.$parent.showHome = false
+            this.$parent.showShop = false
+            this.$parent.showCart = false
+            this.$parent.showProduct = true
+        },
         quantityUp(product) {
             product.quantity ++
             product.product.inventory --
@@ -172,6 +180,7 @@ new Vue({
         shoppingCart: [],
         buyingNumber: 1,
         addingToCart: false,
+        copying: false,
         activeProduct: [],
         inventory: [],
         stripeKey: '',
@@ -199,6 +208,17 @@ new Vue({
             this.showShop = false
             this.showCart = true
             this.showProduct = false
+        },
+        async copyLink(productId) {
+            const base = new URL(window.location.href)
+            const productLink = `${base.origin}/?product=${productId}`
+            try {
+                await navigator.clipboard.writeText(productLink)
+                this.copying = true
+                setTimeout(() => {this.copying = false}, 800)
+            } catch(err) {
+                alert('There was a problem copying the link- try again in a moment.')
+            }
         },
         addToCart(quantity) {
             if (quantity <= this.activeProduct.inventory) {
@@ -250,6 +270,15 @@ new Vue({
                 }).then(res => this.inventory = res.data)
             }
         },
+        productFromLaunch(productId) {
+            axios.get(`/api/product/${productId}`).then(res => this.activeProduct = res.data)
+            .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
+            this.lastFilter = null
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = true
+        },
         getStripeKey() {
             axios.get('/api/getkey/')
             .then(res => {this.stripeKey = res.data.pub_key, this.stripe = Stripe(res.data.pub_key)})
@@ -266,7 +295,7 @@ new Vue({
         },
         saveCart(userCart) {
             localStorage.setItem('cart', JSON.stringify(userCart));
-        }
+        },
     },
     computed: {
         cartQuantity() {
@@ -283,8 +312,14 @@ new Vue({
     mounted() {
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value
         this.getStripeKey()
-        this.goHome()
         const cartData = localStorage.getItem('cart');
         this.shoppingCart = cartData ? JSON.parse(cartData) : [];
+
+        const url = new URL(window.location.href)
+        if (url.searchParams.has('product')) {
+            let params = window.location.href.split('?')
+            let productMatch = params[1].match(/(?<=product=)\d+(?=&|)/)
+            this.productFromLaunch(productMatch[0])
+        }
     },
 })
