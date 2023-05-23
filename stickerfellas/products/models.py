@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class ListItem(models.Model):
     PRODUCT_TYPES=(('S','sticker'),('P','pin'),('H','hat'))
@@ -12,6 +13,8 @@ class ListItem(models.Model):
     artist = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     price_id = models.CharField(max_length=300)
     list_date = models.DateField(auto_now_add=True)
+    inventory = models.IntegerField(verbose_name="Items Available",default=50,
+                                    validators=[MaxValueValidator(99),MinValueValidator(0)])
 
     def __str__(self) -> str:
         return self.name

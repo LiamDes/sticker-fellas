@@ -80,10 +80,13 @@ header {
     fill: var(--background);
 }
 
+.fa-cart-shopping {
+    cursor: pointer;
+}
+
 .addingitem {
     animation-name: cartwiggle;
     animation-duration: 1s;
-    /* overflow-x: hidden; */
 }
 
 @keyframes cartwiggle {
@@ -226,19 +229,44 @@ button {
     text-align: center;
 }
 
+.out {
+    filter: grayscale(80%);
+}
+
+.stock-notice {
+    filter: saturate(300%) brightness(90%);
+    position: absolute;
+    top: 80px;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+
+    background-color: var(--accent);
+    font-weight: 900;
+    line-height: 4em;
+}
+
 .itempreview {
     width: 150px;
     height: 150px;
 }
 
 .single-item {
-    text-align: center;
-
     background-color: var(--background);
     border: 3px solid var(--accent);
     border-radius: 10px;
     margin: 1.3em;
     padding: 0.6em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.close-active {
+    align-self: flex-end;
+    color: var(--header-text);
+    cursor: pointer;
 }
 
 .price {
