@@ -38,8 +38,15 @@ class Reviews(generics.ListAPIView):
 
 class CreateReview(generics.CreateAPIView):
     serializer_class = ReviewSerializer
-    queryset = ProductReview.objects.all()
+    def get_queryset(self):
+        return ProductReview.objects.all()
     
+
+@api_view(['GET'])
+def current_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
 def get_stripe_key(request):

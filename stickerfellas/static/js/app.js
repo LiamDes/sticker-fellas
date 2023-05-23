@@ -35,15 +35,31 @@ Vue.component('ProductReviews', {
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            reviews: []
+            reviews: [],
+            newReviewTitle: 'Test',
+            newReviewDescription: null,
+            newReviewRating: 3,
+            currentUser: {}
         }
     },
     methods: {
         getReviews() {
             axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data)
         },
-        submitReview() {
-            console.log('Thanks :)')
+        async submitReview() {
+            await axios.get('/api/current/').then(res => this.currentUser = res.data.username)
+            
+            axios.post(`/api/reviews/new/`, {
+                "title": this.newReviewTitle,
+                "description": this.newReviewDescription,
+                "date": this.activeDate,
+                "rating": this.newReviewRating,
+                "product": this.listing.id,
+                "user": this.currentUser
+            }, { headers: { 'X-CSRFToken': this.$parent.token } })
+                .then(() => {
+                    this.getReviews()
+                })
         }
     },
     watch: { 

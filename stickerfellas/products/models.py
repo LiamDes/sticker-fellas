@@ -25,7 +25,7 @@ class ListItem(models.Model):
     
 
 class ProductReview(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.CharField(max_length=30)
     product = models.ForeignKey(ListItem, on_delete=models.CASCADE)
     title = models.CharField(max_length=55)
     description = models.CharField(max_length=1000,null=True,blank=True)
