@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from products.models import *
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 from .serializers import *
 from django.conf import settings
 import stripe
@@ -27,6 +27,26 @@ class AllCategory(generics.ListAPIView):
         type = self.request.GET.get('type')
         return ListItem.objects.filter(type=type)
     
+
+class Reviews(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        product = self.kwargs.get("product_id")
+        return ProductReview.objects.filter(product=product)
+    
+
+class CreateReview(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    def get_queryset(self):
+        return ProductReview.objects.all()
+    
+
+@api_view(['GET'])
+def current_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
 def get_stripe_key(request):

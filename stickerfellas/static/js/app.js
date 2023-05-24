@@ -5,6 +5,104 @@ Vue.component('CheckoutComplete', {
     }
 })
 
+Vue.component('ProductReviews', {
+    template: 
+        `<div>
+            <div v-for="review in reviews" class="review-contents">
+                <h3>
+                    [[review.title]] 
+                    <span v-for="star in review.rating">
+                        <i class="fa-solid fa-star"></i>
+                    </span>
+                    <span v-for="star in (5 - review.rating)">
+                        <i class="fa-regular fa-star"></i>
+                    </span>
+                </h3>
+                <cite>by [[review.user]]</cite>
+                <p v-if="review.description">[[review.description]]</p>
+            </div>
+            <div v-if="reviews.length === 0" class="review-contents">
+                No reviews for this product yet! Be the first to add one. ☺
+            </div>
+            <div class="review-contents">
+                <fieldset>
+                    <h3>Make a Review!</h3>
+                    <div class="star-display">
+                        <label for="review-rating"></label>
+                        <div v-for="star in parseInt(newReviewRating)" :id="star" 
+                        @click="newReviewRating = star" class="fullstar" @mouseleave="hovering = null">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div v-for="empty in (5 - parseInt(newReviewRating))" 
+                        :id="empty + parseInt(newReviewRating)" 
+                        @click="newReviewRating = (empty + parseInt(newReviewRating))"
+                        class="emptystar" :class="{fullstar: hovering >= empty + parseInt(newReviewRating)}"
+                        @mouseover="hovering = empty + parseInt(newReviewRating)" @mouseleave="hovering = null">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                    </div>
+                    <label for="review-title"></label>
+                    <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
+                    <label for="review-description"></label>
+                    <textarea v-model="newReviewDescription" placeholder="Your Review"></textarea>
+                    <button @click="submitReview" id="reviewbutton">SEND</button>
+                </fieldset>
+            </div>
+        </div>`,
+    props: {
+        listing: Object
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            reviews: [],
+            hovering: null,
+            newReviewTitle: null,
+            newReviewDescription: null,
+            newReviewRating: 0,
+            currentUser: {}
+        }
+    },
+    methods: {
+        getReviews() {
+            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data.reverse())
+        },
+        async submitReview() {
+            await axios.get('/api/current/').then(res => {
+                this.currentUser = res.data.username
+                if (this.currentUser === '') this.currentUser = 'Anonymous'
+            })
+            
+            axios.post(`/api/reviews/new/`, {
+                "title": this.newReviewTitle,
+                "description": this.newReviewDescription,
+                "date": this.activeDate,
+                "rating": parseInt(this.newReviewRating),
+                "product": this.listing.id,
+                "user": this.currentUser
+            }, { headers: { 'X-CSRFToken': this.$parent.token } })
+                .then(() => {
+                    this.getReviews()
+                    this.newReviewTitle = null
+                    this.newReviewDescription = null
+                    this.newReviewRating = 0
+                })
+        }
+    },
+    watch: { 
+        listing() {
+          this.getReviews()
+        }
+    },
+    mounted() {
+        this.getReviews()
+    }
+})
+
+// Vue.component('MakeReview', {
+
+// })
+
 Vue.component('ItemListings', {
     template: `
     <div class="inner-listing" @mouseover="hovering = true" @mouseleave="hovering = false"
@@ -181,7 +279,7 @@ new Vue({
         buyingNumber: 1,
         addingToCart: false,
         copying: false,
-        activeProduct: [],
+        activeProduct: {},
         inventory: [],
         stripeKey: '',
         token: '',
