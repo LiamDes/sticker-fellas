@@ -1,6 +1,46 @@
 Vue.component('CheckoutComplete', {
     template: `<div class="hidden"></div>`,
-    mounted() {
+    data: () => {
+        return {
+            currentUser: {},
+            orderInfo: []
+        }
+    },
+    methods: {
+        updateHistory() {
+            axios.get('/api/current/')
+            .then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username != '') {
+                    let orders = []
+                    orders = [{
+                        "id": 11,
+                        "name": "Tomato",
+                        "description": "Remember to eat your vegetables. Or fruits?",
+                        "image": "http://127.0.0.1:8000/media/tomato.png",
+                        "price": "0.99",
+                        "type": "S",
+                        "price_id": "price_1N9an0JgrzFtfn7GFkNXDRBe",
+                        "artist": 1,
+                        "inventory": 48,
+                        "list_date": "2023-05-19",
+                        "average_rating": 0
+                    }]
+                    // orders.push(this.$parent.shoppingCart)
+                    console.log(this.currentUser.order_history)
+                    axios.patch(`/api/change/${this.currentUser.id}/`, {
+                        "order_history": this.currentUser.order_history
+                    }, {
+                        headers: { 'X-CSRFToken': this.$parent.token }
+                    })
+                }
+            })
+
+            
+        }
+    },
+    async mounted() {
+        await this.updateHistory()
         localStorage.clear()
     }
 })

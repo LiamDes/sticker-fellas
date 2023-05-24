@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from products.models import ListItem, ProductReview
+from products.models import *
 from django.contrib.auth import get_user_model
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class ItemSerializer(serializers.ModelSerializer):
         
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.CharField()
+    # user = serializers.CharField()
     class Meta:
         model = ProductReview
         fields = ['user', 'product', 'title', 'description', 'rating']
@@ -21,3 +21,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['username', 'id']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    # ordered_by = serializers.CharField()
+    class Meta:
+        model = Order
+        fields = ['ordered_by','order_date','items_ordered']

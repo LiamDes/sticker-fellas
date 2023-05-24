@@ -5,6 +5,7 @@ appname = 'api'
 urlpatterns = [
     path('all/', AllInventory.as_view()),
     path('current/', current_user, name='current_user'),
+    path('orders/', OrderHistories.as_view()),
     path('product/<int:pk>/', ItemDetail.as_view()),
     path('reviews/<int:product_id>', Reviews.as_view()),
     path('reviews/new/', CreateReview.as_view()),
