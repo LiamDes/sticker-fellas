@@ -26,26 +26,27 @@ Vue.component('ProductReviews', {
             </div>
             <div class="review-contents">
                 <fieldset>
-                <div class="star-display">
-                    <label for="review-rating"></label>
-                    <div v-for="star in parseInt(newReviewRating)" :id="star" 
-                    @click="newReviewRating = star" class="fullstar" @mouseleave="hovering = null">
-                        <i class="fa-solid fa-star"></i>
+                    <h3>Make a Review!</h3>
+                    <div class="star-display">
+                        <label for="review-rating"></label>
+                        <div v-for="star in parseInt(newReviewRating)" :id="star" 
+                        @click="newReviewRating = star" class="fullstar" @mouseleave="hovering = null">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div v-for="empty in (5 - parseInt(newReviewRating))" 
+                        :id="empty + parseInt(newReviewRating)" 
+                        @click="newReviewRating = (empty + parseInt(newReviewRating))"
+                        class="emptystar" :class="{fullstar: hovering >= empty + parseInt(newReviewRating)}"
+                        @mouseover="hovering = empty + parseInt(newReviewRating)" @mouseleave="hovering = null">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
                     </div>
-                    <div v-for="empty in (5 - parseInt(newReviewRating))" 
-                    :id="empty + parseInt(newReviewRating)" 
-                    @click="newReviewRating = (empty + parseInt(newReviewRating))"
-                    class="emptystar" :class="{fullstar: hovering >= empty + parseInt(newReviewRating)}"
-                    @mouseover="hovering = empty + parseInt(newReviewRating)" @mouseleave="hovering = null">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                </div>
-                <label for="review-title"></label>
-                <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
-                <label for="review-description"></label>
-                <textarea v-model="newReviewDescription" placeholder="Your Review"></textarea>
+                    <label for="review-title"></label>
+                    <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
+                    <label for="review-description"></label>
+                    <textarea v-model="newReviewDescription" placeholder="Your Review"></textarea>
+                    <button @click="submitReview" id="reviewbutton">SEND</button>
                 </fieldset>
-                <button @click="submitReview">SEND</button>
             </div>
         </div>`,
     props: {
@@ -64,7 +65,7 @@ Vue.component('ProductReviews', {
     },
     methods: {
         getReviews() {
-            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data)
+            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data.reverse())
         },
         async submitReview() {
             await axios.get('/api/current/').then(res => {

@@ -14,6 +14,7 @@
     font-size: 14pt;
 
     background-color: var(--background);
+    color: var(--main-text);
 
     overflow-x: hidden;
 }
@@ -207,6 +208,7 @@ button {
     background-color: var(--header-text);
     color: var(--background);
     border-radius: 4px;
+    border: 2px outset var(--active-tab);
 }
 
 .shop-all {
@@ -266,6 +268,11 @@ button {
     position: relative;
 }
 
+input[type=number] {
+    border-radius: 3px;
+    border: 1px solid var(--header-text)
+}
+
 .review-contents {
     border: 3px solid var(--accent);
     border-radius: 10px;
@@ -282,24 +289,41 @@ button {
 }
 
 .fullstar {
-    color: var(--accent)
+    color: #ffc766;
 }
 
 fieldset {
     border: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
 }
 
 textarea {
-    margin: 0.3em auto;
-    width: 80%;
-    text-indent: 0px;
+    height: 100px;
     text-shadow: none;
-    display: block;
     text-align: start;
     white-space: pre-wrap;
     overflow-wrap: break-word;
+    resize: none;
+    font-family: sans-serif;
+}
 
-    height: 100px;
+textarea::-webkit-scrollbar-track {
+    background-color: #fff;
+    background-image: none!important;
+}
+
+input[type=text], textarea {
+    width: 80%;
+    border: 2px solid var(--header-text);
+    border-radius: 5px;
+    padding: 3px 5px;
+}
+
+input:focus, textarea:focus {
+    outline: 2px inset var(--accent);
 }
 
 .item-actions {
