@@ -141,7 +141,9 @@ Vue.component('OrderHistory', {
                 <summary>Order #[[order[0].order]]</summary>
                 <ul v-for="o in order" class="history-info">
                     <li class="history-product">
-                        ProductName [[o.product]] x [[o.quantity]]
+                        <span v-for="item in fullInventory" 
+                        v-if="item.id === o.product">[[item.name]]</span>
+                         x [[o.quantity]]
                     </li>
                 </ul>
             </details>
@@ -173,7 +175,6 @@ Vue.component('OrderHistory', {
                             axios.get(`/api/purchases/${order.id}`)
                             .then(res => {
                                 this.purchases.push(res.data)
-                                this.matchProducts()
                             })
                         })
                     })
@@ -183,9 +184,6 @@ Vue.component('OrderHistory', {
         logInventory() {
             axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
-        matchProducts() {
-            console.log('TODO: MATCH PRODUCT NAME TO TABLE')
-        }
     },
     async mounted() {
         await this.logInventory()
