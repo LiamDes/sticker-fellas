@@ -52,7 +52,8 @@ def current_user(request):
 
 class OrderHistories(generics.ListAPIView):
     serializer_class = FullOrderSerializer
-    queryset = FullOrder.objects.all()
+    def get_queryset(self):
+        return FullOrder.objects.filter(ordered_by=self.request.user)
 
 
 class CreateOrder(generics.ListCreateAPIView):
@@ -71,6 +72,12 @@ class PurchaseHistories(generics.ListAPIView):
 class NewPurchase(generics.ListCreateAPIView):
     serializer_class = PurchaseSerializer
     queryset = Purchase.objects.all()
+
+
+class PurchasesByOrder(generics.ListAPIView):
+    serializer_class = PurchaseSerializer
+    def get_queryset(self):
+        return Purchase.objects.filter(order=self.kwargs['order'])
 
 
 @api_view(['GET'])

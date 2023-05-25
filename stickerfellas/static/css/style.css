@@ -97,7 +97,7 @@ header {
     80% { transform: rotate(-50deg);}
 }
 
-.homepage, .shopping, .shopping-cart, .reviews {
+.homepage, .shopping, .shopping-cart, .reviews, .user-profile {
     display: none;
 }
 
@@ -315,7 +315,7 @@ textarea::-webkit-scrollbar-track {
     background-image: none!important;
 }
 
-input[type=text], textarea {
+fieldset input[type=text], textarea {
     width: 80%;
     border: 2px solid var(--header-text);
     border-radius: 5px;
@@ -403,7 +403,7 @@ input[type=number] {
     color: var(--header-text)
 }
 
-.delete-item::before {
+.delete-item::before, #username {
     cursor: pointer;
 }
 

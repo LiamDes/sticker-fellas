@@ -135,18 +135,33 @@ Vue.component('ProductReviews', {
 Vue.component('OrderHistory', {
     template: 
         `<div>
-            You rly bought things before huh :). thanks.
-            [[orders]]
+        <section v-if="orders.length > 0">
+            <h4>Your Order History:</h4>
+            <details v-for="order in purchases" class="order-histories">
+                <summary>Order #[[order[0].order]]</summary>
+                <ul v-for="o in order" class="history-info">
+                    <li class="history-product">
+                        ProductName [[o.product]] x [[o.quantity]]
+                    </li>
+                </ul>
+            </details>
+        </section>
+        <section v-else>
+            <h4>No order history. We look forward to you shopping with us!</h4>
+        </section>
         </div>`,
     delimiters: ['[[', ']]'],
     data: () => {
         return {
             currentUser: {},
-            orders: []
+            orders: [],
+            purchases: [],
+            fullInventory: []
         }
     },
     methods: {
         getOrderHistory() {
+            this.purchases = []
             axios.get('/api/current/')
             .then(res => {
                 this.currentUser = res.data
@@ -154,13 +169,26 @@ Vue.component('OrderHistory', {
                     // ensure not anonymous user got here
                     axios.get('/api/orders/').then(res => {
                         this.orders = res.data
-                        // axios.get('/api/purchases/') 
+                        this.orders.forEach(order => {
+                            axios.get(`/api/purchases/${order.id}`)
+                            .then(res => {
+                                this.purchases.push(res.data)
+                                this.matchProducts()
+                            })
+                        })
                     })
                 }
             })
+        },
+        logInventory() {
+            axios.get('/api/all/').then(res => this.fullInventory = res.data)
+        },
+        matchProducts() {
+            console.log('TODO: MATCH PRODUCT NAME TO TABLE')
         }
     },
-    mounted() {
+    async mounted() {
+        await this.logInventory()
         this.getOrderHistory()
     }
 })
@@ -216,6 +244,7 @@ Vue.component('ItemListings', {
             this.$parent.showShop = false
             this.$parent.showCart = false
             this.$parent.showProduct = true
+            this.$parent.showProfile = false
         },
     },
     computed: {
@@ -274,6 +303,7 @@ Vue.component('ShoppingCart', {
             this.$parent.showShop = false
             this.$parent.showCart = false
             this.$parent.showProduct = true
+            this.$parent.showProfile = false
         },
         quantityUp(product) {
             product.quantity ++

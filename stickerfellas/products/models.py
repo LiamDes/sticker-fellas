@@ -38,10 +38,11 @@ class ProductReview(models.Model):
 class FullOrder(models.Model):
     ordered_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
+    product_ordered = models.ManyToManyField(ListItem,through="Purchase")
 
     def __str__(self) -> str:
         return f'Order by {self.ordered_by} on {self.order_date}'
-    
+
 
 class Purchase(models.Model):
     product = models.ForeignKey(ListItem,on_delete=models.CASCADE)
