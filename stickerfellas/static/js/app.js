@@ -132,9 +132,38 @@ Vue.component('ProductReviews', {
     }
 })
 
-// Vue.component('MakeReview', {
-
-// })
+Vue.component('OrderHistory', {
+    template: 
+        `<div>
+            You rly bought things before huh :). thanks.
+            [[orders]]
+        </div>`,
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            currentUser: {},
+            orders: []
+        }
+    },
+    methods: {
+        getOrderHistory() {
+            axios.get('/api/current/')
+            .then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username != '') {
+                    // ensure not anonymous user got here
+                    axios.get('/api/orders/').then(res => {
+                        this.orders = res.data
+                        // axios.get('/api/purchases/') 
+                    })
+                }
+            })
+        }
+    },
+    mounted() {
+        this.getOrderHistory()
+    }
+})
 
 Vue.component('ItemListings', {
     template: `
@@ -306,6 +335,7 @@ new Vue({
         showShop: false,
         showCart: false,
         showProduct: false,
+        showProfile: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
@@ -325,6 +355,7 @@ new Vue({
             this.showShop = false
             this.showCart = false
             this.showProduct = false
+            this.showProfile = false
         },
         openShop(type) {
             this.lastFilter = type
@@ -332,6 +363,7 @@ new Vue({
             this.showShop = true
             this.showCart = false
             this.showProduct = false
+            this.showProfile = false
             this.getProducts(type)
         },
         openCart() {
@@ -339,6 +371,14 @@ new Vue({
             this.showShop = false
             this.showCart = true
             this.showProduct = false
+            this.showProfile = false
+        },
+        openProfile() {
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = false
+            this.showProfile = true
         },
         async copyLink(productId) {
             const base = new URL(window.location.href)
@@ -387,8 +427,6 @@ new Vue({
                     this.stockError = false
                 }, 2000)
             }
-
-            
         },
         getProducts(sort) {
             if (sort === null) {
@@ -406,8 +444,6 @@ new Vue({
             .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
             this.lastFilter = null
             this.showHome = false
-            this.showShop = false
-            this.showCart = false
             this.showProduct = true
         },
         getStripeKey() {
