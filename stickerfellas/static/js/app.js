@@ -3,7 +3,7 @@ Vue.component('CheckoutComplete', {
     data: () => {
         return {
             currentUser: {},
-            orderInfo: []
+            orderInfo: {}
         }
     },
     methods: {
@@ -12,31 +12,24 @@ Vue.component('CheckoutComplete', {
             .then(res => {
                 this.currentUser = res.data
                 if (this.currentUser.username != '') {
-                    let orders = []
-                    orders = [{
-                        "id": 11,
-                        "name": "Tomato",
-                        "description": "Remember to eat your vegetables. Or fruits?",
-                        "image": "http://127.0.0.1:8000/media/tomato.png",
-                        "price": "0.99",
-                        "type": "S",
-                        "price_id": "price_1N9an0JgrzFtfn7GFkNXDRBe",
-                        "artist": 1,
-                        "inventory": 48,
-                        "list_date": "2023-05-19",
-                        "average_rating": 0
-                    }]
-                    // orders.push(this.$parent.shoppingCart)
-                    console.log(this.currentUser.order_history)
-                    axios.patch(`/api/change/${this.currentUser.id}/`, {
-                        "order_history": this.currentUser.order_history
-                    }, {
-                        headers: { 'X-CSRFToken': this.$parent.token }
+                    // create an Order Object
+                    axios.post('/api/orders/new/', {
+                        "ordered_by": this.currentUser.id
+                    }, { headers: { 'X-CSRFToken': this.$parent.token } 
+                    }).then(res => {
+                        this.orderInfo = res.data
+                        // assign each item + it's quantity in shopping cart to Purchase Object
+                        console.log(this.$parent.shoppingCart)
+                        this.$parent.shoppingCart.forEach(item => {
+                            axios.post('/api/purchases/new/', {
+                                "order": this.orderInfo.id,
+                                "product": item.product.id,
+                                "quantity": item.quantity
+                            }, { headers: { 'X-CSRFToken': this.$parent.token }})
+                        }) 
                     })
                 }
             })
-
-            
         }
     },
     async mounted() {

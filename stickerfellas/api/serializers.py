@@ -23,8 +23,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'id']
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class FullOrderSerializer(serializers.ModelSerializer):
     # ordered_by = serializers.CharField()
     class Meta:
-        model = Order
-        fields = ['ordered_by','order_date','items_ordered']
+        model = FullOrder
+        fields = ['id','ordered_by','order_date']
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = ['order','product','quantity']
