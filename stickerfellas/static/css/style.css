@@ -211,6 +211,27 @@ button {
     border: 2px outset var(--active-tab);
 }
 
+details {
+    border: 2px solid var(--accent);
+    border-radius: 5px;
+    margin-bottom: 0.3em;
+}
+
+details summary {
+    cursor: pointer;
+    background-color: var(--accent);
+    border-radius: 2px 2px 0 0;
+}
+
+details li::before {
+    content: "🍀";
+    padding: 3px 5px;
+}
+
+details ul:nth-of-type(even) li::before {
+    content: "🌻";
+}
+
 .shop-all {
     display: flex;
     flex-wrap: wrap;
@@ -437,7 +458,7 @@ input[type=number] {
     text-align: center;
 }
 
-.order-details ul {
+ul {
     list-style-type: none;
     padding: 0;
 }

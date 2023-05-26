@@ -135,6 +135,7 @@ Vue.component('ProductReviews', {
 Vue.component('OrderHistory', {
     template: 
         `<div>
+        <cite>[[customerTitle]]</cite>
         <section v-if="orders.length > 0">
             <h4>Your Order History:</h4>
             <details v-for="order in purchases" class="order-histories">
@@ -158,7 +159,8 @@ Vue.component('OrderHistory', {
             currentUser: {},
             orders: [],
             purchases: [],
-            fullInventory: []
+            fullInventory: [],
+            customerTitle: ''
         }
     },
     methods: {
@@ -184,6 +186,22 @@ Vue.component('OrderHistory', {
         logInventory() {
             axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
+    },
+    computed: {
+        declareTitle() {
+            customerTitles = {
+                0: 'New Kid',
+                1: 'One-Time Order Wonder',
+                2: 'Sticker Apprentice',
+                3: 'Sticker Initiate',
+                4: 'Our Favorite'
+            }
+
+            this.customerTitle = customerTitles[this.orders.length]
+            if (!this.customerTitle) {
+                return this.customerTitle = 'Sticker Champ'
+            } else return this.customerTitle
+        }
     },
     async mounted() {
         await this.logInventory()
