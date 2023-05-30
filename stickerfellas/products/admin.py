@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import ListItem, ProductReview
+from .models import *
 
 admin.site.register(ListItem)
 admin.site.register(ProductReview)
+admin.site.register(FullOrder)
+admin.site.register(Purchase)

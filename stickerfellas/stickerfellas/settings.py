@@ -64,17 +64,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     'https://sandbox.paypal.com',
-#     'http://localhost:8000'
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000'
+]
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
-# SECURE_CROSS_ORIGIN_OPENER_POLICY='unsafe-none'
 
 ROOT_URLCONF = 'stickerfellas.urls'
 

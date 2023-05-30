@@ -1,8 +1,10 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from products.models import *
-# from django.contrib.auth import get_user_model
+from accounts.models import *
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from .serializers import *
 from django.conf import settings
 import stripe
@@ -46,6 +48,36 @@ class CreateReview(generics.CreateAPIView):
 def current_user(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+
+class OrderHistories(generics.ListAPIView):
+    serializer_class = FullOrderSerializer
+    def get_queryset(self):
+        return FullOrder.objects.filter(ordered_by=self.request.user)
+
+
+class CreateOrder(generics.ListCreateAPIView):
+    serializer_class = OrderWriteSerializer
+    def get_queryset(self):
+        return FullOrder.objects.filter(
+            ordered_by=self.request.user
+        ).order_by('-order_date')[:1]
+
+
+class PurchaseHistories(generics.ListAPIView):
+    serializer_class = PurchaseSerializer
+    queryset = Purchase.objects.all()
+
+
+class NewPurchase(generics.ListCreateAPIView):
+    serializer_class = PurchaseWriteSerializer
+    queryset = Purchase.objects.all()
+
+
+class PurchasesByOrder(generics.ListAPIView):
+    serializer_class = PurchaseSerializer
+    def get_queryset(self):
+        return Purchase.objects.filter(order=self.kwargs['order'])
 
 
 @api_view(['GET'])

@@ -11,7 +11,7 @@ class ListItem(models.Model):
     image = models.ImageField()
     price = models.DecimalField(max_digits=5,decimal_places=2,default=0.99)
     type = models.CharField(choices=PRODUCT_TYPES,max_length=1,default="s")
-    artist = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    artist = models.ForeignKey(get_user_model(),on_delete=models.PROTECT)
     price_id = models.CharField(max_length=300)
     list_date = models.DateField(auto_now_add=True)
     inventory = models.IntegerField(verbose_name="Items Available",default=50,
@@ -33,3 +33,21 @@ class ProductReview(models.Model):
 
     def __str__(self) -> str:
         return f'{self.product}: {self.rating}/5'
+
+
+class FullOrder(models.Model):
+    ordered_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    order_date = models.DateTimeField(auto_now_add=True)
+    product_ordered = models.ManyToManyField(ListItem,through="Purchase")
+
+    def __str__(self) -> str:
+        return f'Order by {self.ordered_by} on {self.order_date}'
+
+
+class Purchase(models.Model):
+    product = models.ForeignKey(ListItem,on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    order = models.ForeignKey(FullOrder,on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.order}: {self.quantity} of {self.product}'

@@ -1,6 +1,41 @@
 Vue.component('CheckoutComplete', {
     template: `<div class="hidden"></div>`,
-    mounted() {
+    data: () => {
+        return {
+            currentUser: {},
+            orderInfo: {},
+        }
+    },
+    methods: {
+        updateHistory() {
+            axios.get('/api/current/')
+            .then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username != '') {
+                    // create an Order Object
+                    axios.post('/api/orders/new/', {
+                        "ordered_by": this.currentUser.id,
+                        // "product_ordered": this.cart
+                    }, { headers: { 'X-CSRFToken': this.$parent.token } 
+                    }).then(res => {
+                        this.orderInfo = res.data
+                        // assign each item + it's quantity in shopping cart to Purchase Object
+                        this.$parent.shoppingCart.forEach(item => {
+                            axios.post('/api/purchases/new/', {
+                                "order": this.orderInfo.id,
+                                "product": item.product.id,
+                                "quantity": item.quantity
+                            }, { headers: { 'X-CSRFToken': this.$parent.token }})
+                            }) 
+                    })
+                }
+            })
+        }
+    },
+    async mounted() {
+        const cartData = localStorage.getItem('cart');
+        this.$parent.shoppingCart = cartData ? JSON.parse(cartData) : []
+        await this.updateHistory()
         localStorage.clear()
     }
 })
@@ -99,9 +134,71 @@ Vue.component('ProductReviews', {
     }
 })
 
-// Vue.component('MakeReview', {
+Vue.component('OrderHistory', {
+    template: 
+        `<div>
+        <cite>[[customerTitle]]</cite>
+        <section v-if="orders.length > 0">
+            <h4>Your Order History:</h4>
+            <details v-for="order in orders" class="order-histories">
+                <summary>Order #[[order.id]]</summary>
+                <ul v-for="o in order.product_ordered" class="history-info">
+                <li>
+                    [[o.product.name]]
+                    <span v-if="o.product.type === 'S'">Sticker</span>
+                    <span v-else-if="o.product.type === 'P'">Pin</span>
+                    <span v-else>Hat</span>
+                    x[[o.quantity]]
+                </li>
+                </ul>
+            </details>
+        </section>
+        <section v-else>
+            <h4>No order history. We look forward to you shopping with us!</h4>
+        </section>
+        </div>`,
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            currentUser: {},
+            orders: [],
+            customerTitle: ''
+        }
+    },
+    methods: {
+        getOrderHistory() {
+            // this.purchases = []
+            axios.get('/api/current/')
+            .then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username != '') {
+                    // ensure not anonymous user got here
+                    axios.get('/api/orders/').then(res => {
+                        this.orders = res.data.reverse()
+                        this.setTitle()
+                    })
+                }
+            })
+        },
+        setTitle() {
+            customerTitles = {
+                0: 'New Kid',
+                1: 'One-Time Order Wonder',
+                2: 'Sticker Apprentice',
+                3: 'Sticker Initiate',
+                4: 'Our Favorite'
+            }
 
-// })
+            this.customerTitle = customerTitles[this.orders.length]
+            if (!this.customerTitle) {
+                return this.customerTitle = 'Sticker Champ'
+            } else return this.customerTitle
+        }
+    },
+    mounted() {
+        this.getOrderHistory()
+    }
+})
 
 Vue.component('ItemListings', {
     template: `
@@ -154,6 +251,7 @@ Vue.component('ItemListings', {
             this.$parent.showShop = false
             this.$parent.showCart = false
             this.$parent.showProduct = true
+            this.$parent.showProfile = false
         },
     },
     computed: {
@@ -212,6 +310,7 @@ Vue.component('ShoppingCart', {
             this.$parent.showShop = false
             this.$parent.showCart = false
             this.$parent.showProduct = true
+            this.$parent.showProfile = false
         },
         quantityUp(product) {
             product.quantity ++
@@ -273,6 +372,7 @@ new Vue({
         showShop: false,
         showCart: false,
         showProduct: false,
+        showProfile: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
@@ -292,6 +392,7 @@ new Vue({
             this.showShop = false
             this.showCart = false
             this.showProduct = false
+            this.showProfile = false
         },
         openShop(type) {
             this.lastFilter = type
@@ -299,6 +400,7 @@ new Vue({
             this.showShop = true
             this.showCart = false
             this.showProduct = false
+            this.showProfile = false
             this.getProducts(type)
         },
         openCart() {
@@ -306,6 +408,14 @@ new Vue({
             this.showShop = false
             this.showCart = true
             this.showProduct = false
+            this.showProfile = false
+        },
+        openProfile() {
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = false
+            this.showProfile = true
         },
         async copyLink(productId) {
             const base = new URL(window.location.href)
@@ -354,8 +464,6 @@ new Vue({
                     this.stockError = false
                 }, 2000)
             }
-
-            
         },
         getProducts(sort) {
             if (sort === null) {
@@ -373,8 +481,6 @@ new Vue({
             .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
             this.lastFilter = null
             this.showHome = false
-            this.showShop = false
-            this.showCart = false
             this.showProduct = true
         },
         getStripeKey() {
