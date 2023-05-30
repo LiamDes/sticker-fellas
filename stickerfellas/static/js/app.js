@@ -172,23 +172,32 @@ Vue.component('OrderHistory', {
                 if (this.currentUser.username != '') {
                     // ensure not anonymous user got here
                     axios.get('/api/orders/').then(res => {
-                        this.orders = res.data
+                        this.orders = res.data.reverse()
                         this.orders.forEach(order => {
-                            axios.get(`/api/purchases/${order.id}`)
-                            .then(res => {
-                                this.purchases.push(res.data)
-                            })
+                            console.log(`for ${order.id}`)
+                            this.getPurchases(order.id)
+                            // axios.get(`/api/purchases/${order.id}`)
+                            // .then(res => {
+                            //     console.log(`adding ${order.id}`)
+                            //     this.purchases.push(res.data)
+                            // })
                         })
+                        this.setTitle()
                     })
                 }
+            })
+        },
+        getPurchases(orderId) {
+            axios.get(`/api/purchases/${orderId}`)
+            .then(res => {
+                console.log(`adding ${orderId}`)
+                this.purchases.push(res.data)
             })
         },
         logInventory() {
             axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
-    },
-    computed: {
-        declareTitle() {
+        setTitle() {
             customerTitles = {
                 0: 'New Kid',
                 1: 'One-Time Order Wonder',
