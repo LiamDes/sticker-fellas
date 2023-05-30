@@ -11,7 +11,6 @@ class ItemSerializer(serializers.ModelSerializer):
         
 
 class ReviewSerializer(serializers.ModelSerializer):
-    # user = serializers.CharField()
     class Meta:
         model = ProductReview
         fields = ['user', 'product', 'title', 'description', 'rating']
@@ -23,13 +22,35 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'id']
 
 
+class PurchaseSerializer(serializers.ModelSerializer):
+    product = ItemSerializer()
+    class Meta:
+        model = Purchase
+        fields = ['product','quantity']
+
+
+class PurchaseWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = ['order','product','quantity']
+
+
 class FullOrderSerializer(serializers.ModelSerializer):
+    product_ordered = PurchaseSerializer(many=True,source='purchase_set')
+
     class Meta:
         model = FullOrder
         fields = ['id','ordered_by','order_date','product_ordered']
 
+    def create(self, validated_data):
+        product_data = validated_data.pop('product_ordered')
+        order = FullOrder.objects.create(**validated_data)
+        for purchase_data in product_data:
+            Purchase.objects.create(order=order, **purchase_data)
+        return order
+    
 
-class PurchaseSerializer(serializers.ModelSerializer):
+class OrderWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Purchase
-        fields = ['order','product','quantity']
+        model = FullOrder
+        fields = ['id','ordered_by','order_date','product_ordered']

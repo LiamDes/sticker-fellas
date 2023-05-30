@@ -3,7 +3,7 @@ Vue.component('CheckoutComplete', {
     data: () => {
         return {
             currentUser: {},
-            orderInfo: {}
+            orderInfo: {},
         }
     },
     methods: {
@@ -14,25 +14,27 @@ Vue.component('CheckoutComplete', {
                 if (this.currentUser.username != '') {
                     // create an Order Object
                     axios.post('/api/orders/new/', {
-                        "ordered_by": this.currentUser.id
+                        "ordered_by": this.currentUser.id,
+                        // "product_ordered": this.cart
                     }, { headers: { 'X-CSRFToken': this.$parent.token } 
                     }).then(res => {
                         this.orderInfo = res.data
                         // assign each item + it's quantity in shopping cart to Purchase Object
-                        console.log(this.$parent.shoppingCart)
                         this.$parent.shoppingCart.forEach(item => {
                             axios.post('/api/purchases/new/', {
                                 "order": this.orderInfo.id,
                                 "product": item.product.id,
                                 "quantity": item.quantity
                             }, { headers: { 'X-CSRFToken': this.$parent.token }})
-                        }) 
+                            }) 
                     })
                 }
             })
         }
     },
     async mounted() {
+        const cartData = localStorage.getItem('cart');
+        this.$parent.shoppingCart = cartData ? JSON.parse(cartData) : []
         await this.updateHistory()
         localStorage.clear()
     }
@@ -138,14 +140,16 @@ Vue.component('OrderHistory', {
         <cite>[[customerTitle]]</cite>
         <section v-if="orders.length > 0">
             <h4>Your Order History:</h4>
-            <details v-for="order in purchases" class="order-histories">
-                <summary>Order #[[order[0].order]]</summary>
-                <ul v-for="o in order" class="history-info">
-                    <li class="history-product">
-                        <span v-for="item in fullInventory" 
-                        v-if="item.id === o.product">[[item.name]]</span>
-                         x [[o.quantity]]
-                    </li>
+            <details v-for="order in orders" class="order-histories">
+                <summary>Order #[[order.id]]</summary>
+                <ul v-for="o in order.product_ordered" class="history-info">
+                <li>
+                    [[o.product.name]]
+                    <span v-if="o.product.type === 'S'">Sticker</span>
+                    <span v-else-if="o.product.type === 'P'">Pin</span>
+                    <span v-else>Hat</span>
+                    x[[o.quantity]]
+                </li>
                 </ul>
             </details>
         </section>
@@ -158,14 +162,12 @@ Vue.component('OrderHistory', {
         return {
             currentUser: {},
             orders: [],
-            purchases: [],
-            fullInventory: [],
             customerTitle: ''
         }
     },
     methods: {
         getOrderHistory() {
-            this.purchases = []
+            // this.purchases = []
             axios.get('/api/current/')
             .then(res => {
                 this.currentUser = res.data
@@ -173,29 +175,10 @@ Vue.component('OrderHistory', {
                     // ensure not anonymous user got here
                     axios.get('/api/orders/').then(res => {
                         this.orders = res.data.reverse()
-                        this.orders.forEach(order => {
-                            console.log(`for ${order.id}`)
-                            this.getPurchases(order.id)
-                            // axios.get(`/api/purchases/${order.id}`)
-                            // .then(res => {
-                            //     console.log(`adding ${order.id}`)
-                            //     this.purchases.push(res.data)
-                            // })
-                        })
                         this.setTitle()
                     })
                 }
             })
-        },
-        getPurchases(orderId) {
-            axios.get(`/api/purchases/${orderId}`)
-            .then(res => {
-                console.log(`adding ${orderId}`)
-                this.purchases.push(res.data)
-            })
-        },
-        logInventory() {
-            axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
         setTitle() {
             customerTitles = {
@@ -212,8 +195,7 @@ Vue.component('OrderHistory', {
             } else return this.customerTitle
         }
     },
-    async mounted() {
-        await this.logInventory()
+    mounted() {
         this.getOrderHistory()
     }
 })
