@@ -35,6 +35,15 @@ class ProductReview(models.Model):
         return f'{self.product}: {self.rating}/5'
 
 
+class ReviewReply(models.Model):
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    reply_to = models.ForeignKey(ProductReview, on_delete=models.CASCADE)
+    comment_text = models.CharField(max_length=400)
+
+    def __str__(self) -> str:
+        return f'Reply to Review: {self.reply_to}'
+
+
 class FullOrder(models.Model):
     ordered_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)

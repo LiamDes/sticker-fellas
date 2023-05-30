@@ -44,6 +44,14 @@ class CreateReview(generics.CreateAPIView):
         return ProductReview.objects.all()
     
 
+class Replies(generics.ListAPIView):
+    serializer_class = ReplySerializer
+
+    def get_queryset(self):
+        reply = self.kwargs.get("reply_to_id")
+        return ReviewReply.objects.filter(reply_to=reply)
+    
+
 @api_view(['GET'])
 def current_user(request):
     serializer = UserSerializer(request.user)
