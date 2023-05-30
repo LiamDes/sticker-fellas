@@ -40,6 +40,32 @@ Vue.component('CheckoutComplete', {
     }
 })
 
+Vue.component('Replies', {
+    template: 
+        `<div class="replies-inner">
+            [[replies]]
+
+            <button>Add Reply!</button>
+        </div>`,
+    props: {
+        review: Object
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            replies: []
+        }
+    },
+    methods: {
+        getReplies() {
+            axios.get(`/api/reviews/${this.review.id}/replies/`).then(res => this.replies = res.data.reverse())
+        }
+    },
+    mounted() {
+        this.getReplies()
+    }
+})
+
 Vue.component('ProductReviews', {
     template: 
         `<div>
@@ -55,6 +81,10 @@ Vue.component('ProductReviews', {
                 </h3>
                 <cite>by [[review.user]]</cite>
                 <p v-if="review.description">[[review.description]]</p>
+
+                <div class="replies-box">
+                    <replies :review="review"></replies>
+                </div>
             </div>
             <div v-if="reviews.length === 0" class="review-contents">
                 No reviews for this product yet! Be the first to add one. ☺
@@ -167,7 +197,6 @@ Vue.component('OrderHistory', {
     },
     methods: {
         getOrderHistory() {
-            // this.purchases = []
             axios.get('/api/current/')
             .then(res => {
                 this.currentUser = res.data

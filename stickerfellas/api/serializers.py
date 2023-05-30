@@ -13,7 +13,7 @@ class ItemSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
-        fields = ['user', 'product', 'title', 'description', 'rating']
+        fields = ['id', 'user', 'product', 'title', 'description', 'rating']
 
 
 class ReplySerializer(serializers.ModelSerializer):
