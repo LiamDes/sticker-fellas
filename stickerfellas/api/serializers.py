@@ -21,13 +21,14 @@ class ReplySerializer(serializers.ModelSerializer):
     user = serializers.CharField()
     class Meta:
         model = ReviewReply
-        fields = ['user','reply_to','comment_text','posted']
+        fields = ['id','user','reply_to','secondary_reply',
+                  'comment_text','posted']
 
 
 class ReplyWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewReply
-        fields = ['user','reply_to','comment_text']
+        fields = ['user','reply_to','secondary_reply','comment_text']
 
 
 class UserSerializer(serializers.ModelSerializer):

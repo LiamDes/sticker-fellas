@@ -41,6 +41,7 @@ class ReviewReply(models.Model):
     reply_to = models.ForeignKey(ProductReview, on_delete=models.CASCADE)
     comment_text = models.CharField(max_length=400)
     posted = models.DateTimeField(auto_now_add=True)
+    secondary_reply = models.ForeignKey('self',on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self) -> str:
         return f'Reply to Review: {self.reply_to}'

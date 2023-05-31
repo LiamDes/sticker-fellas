@@ -49,30 +49,53 @@ Vue.component('Replies', {
                 <textarea v-model="replyText"></textarea>
                 <button @click="addReply">Send</button>
             </div>
-            <div v-for="reply in replies" class="reply">
-                <cite>[[reply.user]]
-                    <span class="post-time">[[dateString(reply.posted)]]</span>
-                </cite> 
-                <p>[[reply.comment_text]]</p>
+            <div v-for="reply in replies" v-if="!reply.secondary_reply" class="reply-wrapper">
+                <div class="reply">
+                    <cite>[[reply.user]]
+                        <span class="post-time">[[dateString(reply.posted)]]</span>
+                    </cite> 
+                    <p>[[reply.comment_text]]</p>
+                    <i class="fa-solid fa-reply" @click="threadToggle(reply.id)" v-if="currentUser != 'Anonymous'" title="Reply to this comment!"></i>
+                    <div v-if="replyTo === reply.id" class="reply-create">
+                        <h5>Replying as [[currentUser.username]]</h5>
+                        <textarea v-model="threadText"></textarea>
+                        <button @click="addThreadReply(reply.id)">Send</button>
+                    </div>
+                </div>
+                <div v-for="t in threaded" v-if="t.secondary_reply === reply.id" class="reply thread">
+                    <cite>[[t.user]]
+                        <span class="post-time">[[dateString(t.posted)]]</span>
+                    </cite> 
+                    <p>[[t.comment_text]]</p>
+                </div>
             </div>
+            
+            
         </div>`,
     props: {
-        review: Object,
-        listing: Object
+        review: Object
     },
     delimiters: ['[[', ']]'],
     data: () => {
         return {
             replies: [],
+            threaded: [],
             currentUser: {},
             replying: false,
+            replyTo: null,
             replyText: '',
+            threadText: '',
         }
     },
     methods: {
         async getReplies() {
-            this.replies = []
-            axios.get(`/api/${this.review.id}/replies/`).then(res => this.replies = res.data)
+            this.threaded = []
+            axios.get(`/api/${this.review.id}/replies/`).then(res => {
+                this.replies = res.data
+                this.replies.forEach(reply => {
+                    if (reply.secondary_reply) this.threaded.push(reply)
+                })
+            })
         },
         addReply() {
             if (this.currentUser != "Anonymous" 
@@ -90,6 +113,23 @@ Vue.component('Replies', {
                 })
             }
         },
+        addThreadReply(parent) {
+            if (this.currentUser != "Anonymous" 
+            && this.currentUser.username != ''
+            && this.threadText != '') {
+                axios.post('/api/replies/new/', {
+                    "user": this.currentUser.id,
+                    "reply_to": this.review.id,
+                    "comment_text": this.threadText,
+                    "secondary_reply": parent
+                }, { headers: { 'X-CSRFToken': this.$root.token } 
+                }).then(res => {
+                    this.replyTo = null
+                    this.threadText = ''
+                    this.getReplies()
+                })
+            }
+        },
         authenticate() {
             axios.get('/api/current/').then(res => {
                 this.currentUser = res.data
@@ -98,6 +138,10 @@ Vue.component('Replies', {
         },
         dateString(date) {
             return new Date(date).toLocaleString()
+        },
+        threadToggle(replyId) {
+            if (this.replyTo === replyId) return this.replyTo = null
+            else return this.replyTo = replyId
         }
     },
     mounted() {
@@ -130,7 +174,7 @@ Vue.component('ProductReviews', {
                 <p v-if="review.description">[[review.description]]</p>
 
                 <div class="replies-box">
-                    <replies :review="review" :listing="listing"></replies>
+                    <replies :review="review"></replies>
                 </div>
             </div>
             <div v-if="reviews.length === 0" class="review-contents">

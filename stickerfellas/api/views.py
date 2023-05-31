@@ -49,6 +49,8 @@ class Replies(generics.ListAPIView):
 
     def get_queryset(self):
         reply = self.kwargs.get("reply_to_id")
+        thread = self.kwargs.get("secondary_reply")
+        print(thread)
         return ReviewReply.objects.filter(reply_to=reply)
     
 
