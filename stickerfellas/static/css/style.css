@@ -138,6 +138,10 @@ header {
     background-color: var(--active-tab);
 }
 
+.admin-edit button{
+    padding: 3px;
+}
+
 .primary-banner {
     background-image: linear-gradient(45deg, #f1faf8, #8ec0ab);
     border-top: 2px solid var(--header-text);

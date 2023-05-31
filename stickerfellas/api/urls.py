@@ -4,7 +4,6 @@ from .views import *
 appname = 'api'
 urlpatterns = [
     path('all/', AllInventory.as_view()),
-    path('update/<int:pk>/', InventoryUpdate.as_view()),
     path('current/', current_user, name='current_user'),
     path('orders/', OrderHistories.as_view()),
     path('orders/new/', CreateOrder.as_view()),

@@ -253,9 +253,6 @@ Vue.component('ProductReviews', {
     //       this.getReviews()
     //     }
     // },
-    // mounted() {
-    //     this.getReviews()
-    // }
 })
 
 Vue.component('OrderHistory', {
@@ -492,15 +489,53 @@ Vue.component('ShoppingCart', {
 
 Vue.component('AdminPanel', {
     template: `
-    <div>
-        Welcone.
-    </div>`,
-    props: {
-    }, 
+    <section>
+        <h3>Item Management</h3>
+        <div v-for="product in fullInventory" class="admin-edit">
+            <h5>[[product.name]] <i class="fa-solid fa-delete-left delete-item" @click="deleteProduct(product)"></i></h5>
+            Current Stock: [[product.inventory]]
+            <button class="fa-solid fa-wrench" @click="editToggle(product.id)"></button>
+            <div v-if="edit === product.id">
+                <label for="stockupdate">New Stock: </label>
+                <input type="number" v-model="newStock">
+                <button class="fa-solid fa-floppy-disk" @click="updateInventory(product)"></button>
+            </div>
+        </div>
+    </section>`,
     delimiters: ['[[', ']]'],
     data: () => {
         return {
+            fullInventory: [],
+            edit: null,
+            newStock: 0
         }
+    },
+    methods: {
+        retrieveInventory() {
+            axios.get('/api/all/').then(res => this.fullInventory = res.data)
+        },
+        deleteProduct(product) {
+            console.log(`why would you want to delete ${product.name}.`)
+        },
+        editToggle(productId) {
+            if (this.edit === productId) return this.edit = null
+            else return this.edit = productId
+        },
+        updateInventory(product) {
+            console.log(`we update ${product.name}`)
+            console.log(`from stock of ${product.inventory} to ${this.newStock}`)
+            axios.patch(`/api/product/${product.id}/`,
+            { "inventory": this.newStock },
+            { headers: { 'X-CSRFToken': this.$parent.token } }
+            ).then(res => {
+                this.newStock = 0
+                this.edit = null
+                this.retrieveInventory()
+            })
+        }
+    },
+    mounted() {
+        this.retrieveInventory()
     }
 })
 

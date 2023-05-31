@@ -21,12 +21,6 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
         return ListItem.objects.filter(pk=self.kwargs['pk'])
 
 
-class InventoryUpdate(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ItemSerializer
-    def get_queryset(self):
-        return ListItem.objects.filter(pk=self.kwargs['pk'])
-
-
 class AllCategory(generics.ListAPIView):
     serializer_class = ItemSerializer
     def get_queryset(self):
