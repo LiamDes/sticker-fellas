@@ -120,7 +120,7 @@
                     <div class="price">[[activeProduct.price]]</div>
                     <caption>[[activeProduct.description]]</caption>
                     <p v-if="activeProduct.average_rating != 0">
-                        Rating: [[activeProduct.average_rating]]/5
+                        Rating: [[averageRound(activeProduct.average_rating)]]/5
                     </p>
                     <div class="price">[[activeProduct.inventory]] in Stock!</div>
                     <section class="buying">
@@ -134,7 +134,8 @@
 
             <article class="reviews" :class="{'fullmenu':showProduct}">
                 <h1>Reviews:</h1>
-                <product-reviews v-if="Object.keys(activeProduct).length > 0" :listing="activeProduct"></product-reviews>
+                <product-reviews :listing="activeProduct" 
+                    :reviews="activeReviews"></product-reviews>
             </article>
             {% endblock %}
         </main>

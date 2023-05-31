@@ -340,6 +340,10 @@ input[type=number] {
     margin: 0.3em;
 }
 
+.post-time {
+    font-size: 10pt;
+}
+
 .star-display {
     display: flex;
     justify-content: center;

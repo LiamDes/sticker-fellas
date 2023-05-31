@@ -50,12 +50,15 @@ Vue.component('Replies', {
                 <button @click="addReply">Send</button>
             </div>
             <div v-for="reply in replies" class="reply">
-                <cite>[[reply.user]]</cite>
+                <cite>[[reply.user]]
+                    <span class="post-time">[[dateString(reply.posted)]]</span>
+                </cite> 
                 <p>[[reply.comment_text]]</p>
             </div>
         </div>`,
     props: {
-        review: Object
+        review: Object,
+        listing: Object
     },
     delimiters: ['[[', ']]'],
     data: () => {
@@ -67,14 +70,15 @@ Vue.component('Replies', {
         }
     },
     methods: {
-        getReplies() {
-            axios.get(`/api/reviews/${this.review.id}/replies/`).then(res => this.replies = res.data)
+        async getReplies() {
+            this.replies = []
+            axios.get(`/api/${this.review.id}/replies/`).then(res => this.replies = res.data)
         },
         addReply() {
             if (this.currentUser != "Anonymous" 
             && this.currentUser.username != ''
             && this.replyText != '') {
-                axios.post('/api/reviews/replies/new/', {
+                axios.post('/api/replies/new/', {
                     "user": this.currentUser.id,
                     "reply_to": this.review.id,
                     "comment_text": this.replyText
@@ -91,11 +95,19 @@ Vue.component('Replies', {
                 this.currentUser = res.data
                 if (this.currentUser.username === '') this.currentUser = 'Anonymous'
             })
+        },
+        dateString(date) {
+            return new Date(date).toLocaleString()
         }
     },
     mounted() {
         this.authenticate()
         this.getReplies()
+    },
+    watch: { 
+        review() {
+          this.getReplies()
+        }
     }
 })
 
@@ -112,11 +124,13 @@ Vue.component('ProductReviews', {
                         <i class="fa-regular fa-star"></i>
                     </span>
                 </h3>
-                <cite>by [[review.user]]</cite>
+                <cite>by [[review.user]] 
+                    <span class="post-time">[[dateString(review.posted)]]</span>
+                </cite>
                 <p v-if="review.description">[[review.description]]</p>
 
                 <div class="replies-box">
-                    <replies :review="review"></replies>
+                    <replies :review="review" :listing="listing"></replies>
                 </div>
             </div>
             <div v-if="reviews.length === 0" class="review-contents">
@@ -148,12 +162,12 @@ Vue.component('ProductReviews', {
             </div>
         </div>`,
     props: {
-        listing: Object
+        listing: Object,
+        reviews: Array
     },
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            reviews: [],
             hovering: null,
             newReviewTitle: null,
             newReviewDescription: null,
@@ -162,9 +176,9 @@ Vue.component('ProductReviews', {
         }
     },
     methods: {
-        getReviews() {
-            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data.reverse())
-        },
+        // getReviews() {
+        //     axios.get(`/api/reviews/${this.listing.id}`).then(res => this.$parent.activeReviews = res.data.reverse())
+        // },
         async submitReview() {
             await axios.get('/api/current/').then(res => {
                 this.currentUser = res.data.username
@@ -180,21 +194,24 @@ Vue.component('ProductReviews', {
                 "user": this.currentUser
             }, { headers: { 'X-CSRFToken': this.$parent.token } })
                 .then(() => {
-                    this.getReviews()
+                    this.$parent.getReviews(this.listing.id)
                     this.newReviewTitle = null
                     this.newReviewDescription = null
                     this.newReviewRating = 0
                 })
+        },
+        dateString(date) {
+            return new Date(date).toLocaleString()
         }
     },
-    watch: { 
-        listing() {
-          this.getReviews()
-        }
-    },
-    mounted() {
-        this.getReviews()
-    }
+    // watch: { 
+    //     listing() {
+    //       this.getReviews()
+    //     }
+    // },
+    // mounted() {
+    //     this.getReviews()
+    // }
 })
 
 Vue.component('OrderHistory', {
@@ -308,7 +325,10 @@ Vue.component('ItemListings', {
             })
         },
         openProduct(itemID) {
-            axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
+            axios.get(`/api/product/${itemID}`).then(res => {
+                this.$parent.activeProduct = res.data
+                this.$parent.getReviews(itemID)
+            })
             this.$parent.showHome = false
             this.$parent.showShop = false
             this.$parent.showCart = false
@@ -442,6 +462,7 @@ new Vue({
         addingToCart: false,
         copying: false,
         activeProduct: {},
+        activeReviews: [],
         inventory: [],
         stripeKey: '',
         token: '',
@@ -538,8 +559,14 @@ new Vue({
                 }).then(res => this.inventory = res.data)
             }
         },
+        getReviews(productId) {
+            axios.get(`/api/reviews/${productId}`).then(res => this.activeReviews = res.data.reverse())
+        },
         productFromLaunch(productId) {
-            axios.get(`/api/product/${productId}`).then(res => this.activeProduct = res.data)
+            axios.get(`/api/product/${productId}`).then(res => {
+                this.activeProduct = res.data
+                this.getReviews(productId)
+            })
             .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
             this.lastFilter = null
             this.showHome = false
@@ -562,6 +589,12 @@ new Vue({
         saveCart(userCart) {
             localStorage.setItem('cart', JSON.stringify(userCart));
         },
+        averageRound(average) {
+            if (average) {
+                let av = new Number(average)
+                return av.toFixed(2)
+            }
+        }
     },
     computed: {
         cartQuantity() {
@@ -573,7 +606,7 @@ new Vue({
                 })
                 return quantity
             } else {return ''}
-        }
+        },
     },
     mounted() {
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value

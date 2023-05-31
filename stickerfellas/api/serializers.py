@@ -13,14 +13,15 @@ class ItemSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
-        fields = ['id', 'user', 'product', 'title', 'description', 'rating']
+        fields = ['id','user','product','title','description',
+                  'rating','posted']
 
 
 class ReplySerializer(serializers.ModelSerializer):
     user = serializers.CharField()
     class Meta:
         model = ReviewReply
-        fields = ['user','reply_to','comment_text']
+        fields = ['user','reply_to','comment_text','posted']
 
 
 class ReplyWriteSerializer(serializers.ModelSerializer):
