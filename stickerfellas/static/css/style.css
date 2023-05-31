@@ -32,6 +32,10 @@ h3 {
     font-family: 'Darumadrop One', cursive;
 }
 
+h5 {
+    margin: 0.2em 0;
+}
+
 a {
     text-decoration: none;
     color: var(--main-text);
@@ -299,6 +303,41 @@ input[type=number] {
     border-radius: 10px;
     margin: 0 1em 1em 1em;
     padding: 0.6em;
+}
+
+.replies-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.replies-inner i {
+    align-self: flex-end;
+    cursor: pointer;
+    color: var(--header-text);
+}
+
+.reply-create {
+    padding: 0.3em;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.reply-create button {
+    align-self: flex-start;
+}
+
+.reply {
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    width: 80%;
+    margin: 0;
+    padding: 0.3em;
+}
+
+.reply p {
+    margin: 0.3em;
 }
 
 .star-display {

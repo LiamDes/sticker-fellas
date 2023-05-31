@@ -43,9 +43,16 @@ Vue.component('CheckoutComplete', {
 Vue.component('Replies', {
     template: 
         `<div class="replies-inner">
-            [[replies]]
-
-            <button>Add Reply!</button>
+            <i class="fa-solid fa-reply" @click="replying = !replying" v-if="currentUser != 'Anonymous'" title="Reply to this review!"></i>
+            <div v-if="replying" class="reply-create">
+                <h5>Replying as [[currentUser.username]]</h5>
+                <textarea v-model="replyText"></textarea>
+                <button @click="addReply">Send</button>
+            </div>
+            <div v-for="reply in replies" class="reply">
+                <cite>[[reply.user]]</cite>
+                <p>[[reply.comment_text]]</p>
+            </div>
         </div>`,
     props: {
         review: Object
@@ -53,15 +60,41 @@ Vue.component('Replies', {
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            replies: []
+            replies: [],
+            currentUser: {},
+            replying: false,
+            replyText: '',
         }
     },
     methods: {
         getReplies() {
-            axios.get(`/api/reviews/${this.review.id}/replies/`).then(res => this.replies = res.data.reverse())
+            axios.get(`/api/reviews/${this.review.id}/replies/`).then(res => this.replies = res.data)
+        },
+        addReply() {
+            if (this.currentUser != "Anonymous" 
+            && this.currentUser.username != ''
+            && this.replyText != '') {
+                axios.post('/api/reviews/replies/new/', {
+                    "user": this.currentUser.id,
+                    "reply_to": this.review.id,
+                    "comment_text": this.replyText
+                }, { headers: { 'X-CSRFToken': this.$root.token } 
+                }).then(res => {
+                    this.replying = false
+                    this.replyText = ''
+                    this.getReplies()
+                })
+            }
+        },
+        authenticate() {
+            axios.get('/api/current/').then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username === '') this.currentUser = 'Anonymous'
+            })
         }
     },
     mounted() {
+        this.authenticate()
         this.getReplies()
     }
 })
