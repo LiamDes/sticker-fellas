@@ -490,6 +490,20 @@ Vue.component('ShoppingCart', {
     }
 })
 
+Vue.component('AdminPanel', {
+    template: `
+    <div>
+        Welcone.
+    </div>`,
+    props: {
+    }, 
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+        }
+    }
+})
+
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -499,6 +513,7 @@ new Vue({
         showCart: false,
         showProduct: false,
         showProfile: false,
+        showAdmin: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
@@ -520,6 +535,7 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
         },
         openShop(type) {
             this.lastFilter = type
@@ -528,6 +544,7 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
             this.getProducts(type)
         },
         openCart() {
@@ -536,6 +553,7 @@ new Vue({
             this.showCart = true
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
         },
         openProfile() {
             this.showHome = false
@@ -543,6 +561,15 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = true
+            this.showAdmin = false
+        },
+        openAdmin() {
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = false
+            this.showProfile = false
+            this.showAdmin = true
         },
         async copyLink(productId) {
             const base = new URL(window.location.href)

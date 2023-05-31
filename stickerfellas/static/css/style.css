@@ -101,7 +101,8 @@ header {
     80% { transform: rotate(-50deg);}
 }
 
-.homepage, .shopping, .shopping-cart, .reviews, .user-profile {
+.homepage, .shopping, .shopping-cart, 
+.reviews, .user-profile, .admin-panel {
     display: none;
 }
 

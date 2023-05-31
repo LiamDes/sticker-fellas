@@ -1,10 +1,8 @@
-from rest_framework import generics, permissions
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from products.models import *
 from accounts.models import *
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 from .serializers import *
 from django.conf import settings
 import stripe
@@ -21,14 +19,20 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         return ListItem.objects.filter(pk=self.kwargs['pk'])
-    
+
+
+class InventoryUpdate(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ItemSerializer
+    def get_queryset(self):
+        return ListItem.objects.filter(pk=self.kwargs['pk'])
+
 
 class AllCategory(generics.ListAPIView):
     serializer_class = ItemSerializer
     def get_queryset(self):
         type = self.request.GET.get('type')
         return ListItem.objects.filter(type=type)
-    
+
 
 class Reviews(generics.ListAPIView):
     serializer_class = ReviewSerializer

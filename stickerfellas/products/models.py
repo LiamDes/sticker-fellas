@@ -11,7 +11,6 @@ class ListItem(models.Model):
     image = models.ImageField()
     price = models.DecimalField(max_digits=5,decimal_places=2,default=0.99)
     type = models.CharField(choices=PRODUCT_TYPES,max_length=1,default="s")
-    artist = models.ForeignKey(get_user_model(),on_delete=models.PROTECT)
     price_id = models.CharField(max_length=300)
     list_date = models.DateField(auto_now_add=True)
     inventory = models.IntegerField(verbose_name="Items Available",default=50,

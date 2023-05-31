@@ -54,6 +54,9 @@
             <div @click="openShop('S')">STICKERS</div>
             <div @click="openShop('P')">PINS</div>
             <div @click="openShop('H')">HATS</div> 
+            {% if user.is_staff %}
+            <div @click="openAdmin">MANAGE</div>
+            {% endif %}
         </nav>
         {% endblock %}
 
@@ -82,9 +85,14 @@
                 </section>
             </article>
 
+            <article class="admin-panel" :class="{'fullmenu':showAdmin}">
+                {% if user.is_staff %}
+                <admin-panel></admin-panel>
+                {% endif %}
+            </article>
+
             <article class="user-profile" :class="{'fullmenu':showProfile}">
                 <h3>{{user.username}}</h3>
-                <!-- <p>Maybe some custom stuff here.</p> -->
                 <order-history></order-history>
             </article>
 
@@ -135,7 +143,7 @@
             <article class="reviews" :class="{'fullmenu':showProduct}">
                 <h1>Reviews:</h1>
                 <product-reviews :listing="activeProduct" 
-                    :reviews="activeReviews"></product-reviews>
+                    :reviews="activeReviews" :key="activeProduct.id"></product-reviews>
             </article>
             {% endblock %}
         </main>
