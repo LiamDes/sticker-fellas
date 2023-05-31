@@ -40,6 +40,121 @@ Vue.component('CheckoutComplete', {
     }
 })
 
+Vue.component('Replies', {
+    template: 
+        `<div class="replies-inner">
+            <i class="fa-solid fa-reply" @click="replying = !replying" v-if="currentUser != 'Anonymous'" title="Reply to this review!"></i>
+            <div v-if="replying" class="reply-create">
+                <h5>Replying as [[currentUser.username]]</h5>
+                <textarea v-model="replyText"></textarea>
+                <button @click="addReply">Send</button>
+            </div>
+            <div v-for="reply in replies" v-if="!reply.secondary_reply" class="reply-wrapper">
+                <div class="reply">
+                    <cite>[[reply.user]]
+                        <span class="post-time">[[dateString(reply.posted)]]</span>
+                    </cite> 
+                    <p>[[reply.comment_text]]</p>
+                    <i class="fa-solid fa-reply" @click="threadToggle(reply.id)" v-if="currentUser != 'Anonymous'" title="Reply to this comment!"></i>
+                    <div v-if="replyTo === reply.id" class="reply-create">
+                        <h5>Replying as [[currentUser.username]]</h5>
+                        <textarea v-model="threadText"></textarea>
+                        <button @click="addThreadReply(reply.id)">Send</button>
+                    </div>
+                </div>
+                <div v-for="t in threaded" v-if="t.secondary_reply === reply.id" class="reply thread">
+                    <cite>[[t.user]]
+                        <span class="post-time">[[dateString(t.posted)]]</span>
+                    </cite> 
+                    <p>[[t.comment_text]]</p>
+                </div>
+            </div>
+            
+            
+        </div>`,
+    props: {
+        review: Object
+    },
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            replies: [],
+            threaded: [],
+            currentUser: {},
+            replying: false,
+            replyTo: null,
+            replyText: '',
+            threadText: '',
+        }
+    },
+    methods: {
+        async getReplies() {
+            this.threaded = []
+            axios.get(`/api/${this.review.id}/replies/`).then(res => {
+                this.replies = res.data
+                this.replies.forEach(reply => {
+                    if (reply.secondary_reply) this.threaded.push(reply)
+                })
+            })
+        },
+        addReply() {
+            if (this.currentUser != "Anonymous" 
+            && this.currentUser.username != ''
+            && this.replyText != '') {
+                axios.post('/api/replies/new/', {
+                    "user": this.currentUser.id,
+                    "reply_to": this.review.id,
+                    "comment_text": this.replyText
+                }, { headers: { 'X-CSRFToken': this.$root.token } 
+                }).then(res => {
+                    this.replying = false
+                    this.replyText = ''
+                    this.getReplies()
+                })
+            }
+        },
+        addThreadReply(parent) {
+            if (this.currentUser != "Anonymous" 
+            && this.currentUser.username != ''
+            && this.threadText != '') {
+                axios.post('/api/replies/new/', {
+                    "user": this.currentUser.id,
+                    "reply_to": this.review.id,
+                    "comment_text": this.threadText,
+                    "secondary_reply": parent
+                }, { headers: { 'X-CSRFToken': this.$root.token } 
+                }).then(res => {
+                    this.replyTo = null
+                    this.threadText = ''
+                    this.getReplies()
+                })
+            }
+        },
+        authenticate() {
+            axios.get('/api/current/').then(res => {
+                this.currentUser = res.data
+                if (this.currentUser.username === '') this.currentUser = 'Anonymous'
+            })
+        },
+        dateString(date) {
+            return new Date(date).toLocaleString()
+        },
+        threadToggle(replyId) {
+            if (this.replyTo === replyId) return this.replyTo = null
+            else return this.replyTo = replyId
+        }
+    },
+    mounted() {
+        this.authenticate()
+        this.getReplies()
+    },
+    watch: { 
+        review() {
+          this.getReplies()
+        }
+    }
+})
+
 Vue.component('ProductReviews', {
     template: 
         `<div>
@@ -53,8 +168,14 @@ Vue.component('ProductReviews', {
                         <i class="fa-regular fa-star"></i>
                     </span>
                 </h3>
-                <cite>by [[review.user]]</cite>
+                <cite>by [[review.user]] 
+                    <span class="post-time">[[dateString(review.posted)]]</span>
+                </cite>
                 <p v-if="review.description">[[review.description]]</p>
+
+                <div class="replies-box">
+                    <replies :review="review"></replies>
+                </div>
             </div>
             <div v-if="reviews.length === 0" class="review-contents">
                 No reviews for this product yet! Be the first to add one. ☺
@@ -85,12 +206,12 @@ Vue.component('ProductReviews', {
             </div>
         </div>`,
     props: {
-        listing: Object
+        listing: Object,
+        reviews: Array
     },
     delimiters: ['[[', ']]'],
     data: () => {
         return {
-            reviews: [],
             hovering: null,
             newReviewTitle: null,
             newReviewDescription: null,
@@ -99,9 +220,9 @@ Vue.component('ProductReviews', {
         }
     },
     methods: {
-        getReviews() {
-            axios.get(`/api/reviews/${this.listing.id}`).then(res => this.reviews = res.data.reverse())
-        },
+        // getReviews() {
+        //     axios.get(`/api/reviews/${this.listing.id}`).then(res => this.$parent.activeReviews = res.data.reverse())
+        // },
         async submitReview() {
             await axios.get('/api/current/').then(res => {
                 this.currentUser = res.data.username
@@ -117,21 +238,24 @@ Vue.component('ProductReviews', {
                 "user": this.currentUser
             }, { headers: { 'X-CSRFToken': this.$parent.token } })
                 .then(() => {
-                    this.getReviews()
+                    this.$parent.getReviews(this.listing.id)
                     this.newReviewTitle = null
                     this.newReviewDescription = null
                     this.newReviewRating = 0
                 })
+        },
+        dateString(date) {
+            return new Date(date).toLocaleString()
         }
     },
-    watch: { 
-        listing() {
-          this.getReviews()
-        }
-    },
-    mounted() {
-        this.getReviews()
-    }
+    // watch: { 
+    //     listing() {
+    //       this.getReviews()
+    //     }
+    // },
+    // mounted() {
+    //     this.getReviews()
+    // }
 })
 
 Vue.component('OrderHistory', {
@@ -167,7 +291,6 @@ Vue.component('OrderHistory', {
     },
     methods: {
         getOrderHistory() {
-            // this.purchases = []
             axios.get('/api/current/')
             .then(res => {
                 this.currentUser = res.data
@@ -246,7 +369,10 @@ Vue.component('ItemListings', {
             })
         },
         openProduct(itemID) {
-            axios.get(`/api/product/${itemID}`).then(res => this.$parent.activeProduct = res.data)
+            axios.get(`/api/product/${itemID}`).then(res => {
+                this.$parent.activeProduct = res.data
+                this.$parent.getReviews(itemID)
+            })
             this.$parent.showHome = false
             this.$parent.showShop = false
             this.$parent.showCart = false
@@ -380,6 +506,7 @@ new Vue({
         addingToCart: false,
         copying: false,
         activeProduct: {},
+        activeReviews: [],
         inventory: [],
         stripeKey: '',
         token: '',
@@ -476,8 +603,14 @@ new Vue({
                 }).then(res => this.inventory = res.data)
             }
         },
+        getReviews(productId) {
+            axios.get(`/api/reviews/${productId}`).then(res => this.activeReviews = res.data.reverse())
+        },
         productFromLaunch(productId) {
-            axios.get(`/api/product/${productId}`).then(res => this.activeProduct = res.data)
+            axios.get(`/api/product/${productId}`).then(res => {
+                this.activeProduct = res.data
+                this.getReviews(productId)
+            })
             .catch (err => window.location.replace('http://127.0.0.1:8000/error/'))
             this.lastFilter = null
             this.showHome = false
@@ -500,6 +633,12 @@ new Vue({
         saveCart(userCart) {
             localStorage.setItem('cart', JSON.stringify(userCart));
         },
+        averageRound(average) {
+            if (average) {
+                let av = new Number(average)
+                return av.toFixed(2)
+            }
+        }
     },
     computed: {
         cartQuantity() {
@@ -511,7 +650,7 @@ new Vue({
                 })
                 return quantity
             } else {return ''}
-        }
+        },
     },
     mounted() {
         this.token = document.querySelector('input[name=csrfmiddlewaretoken]').value

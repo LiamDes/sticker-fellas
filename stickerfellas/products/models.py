@@ -30,9 +30,21 @@ class ProductReview(models.Model):
     title = models.CharField(max_length=55)
     description = models.CharField(max_length=1000,null=True,blank=True)
     rating = models.IntegerField(default=0,validators=[MaxValueValidator(5),MinValueValidator(0)])
+    posted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f'{self.product}: {self.rating}/5'
+
+
+class ReviewReply(models.Model):
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    reply_to = models.ForeignKey(ProductReview, on_delete=models.CASCADE)
+    comment_text = models.CharField(max_length=400)
+    posted = models.DateTimeField(auto_now_add=True)
+    secondary_reply = models.ForeignKey('self',on_delete=models.CASCADE,blank=True,null=True)
+
+    def __str__(self) -> str:
+        return f'Reply to Review: {self.reply_to}'
 
 
 class FullOrder(models.Model):
