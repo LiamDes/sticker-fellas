@@ -497,8 +497,39 @@ Vue.component('AdminPanel', {
             <button class="fa-solid fa-wrench" @click="editToggle(product.id)"></button>
             <div v-if="edit === product.id">
                 <label for="stockupdate">New Stock: </label>
-                <input type="number" v-model="newStock">
+                <input type="number" v-model="editStock">
                 <button class="fa-solid fa-floppy-disk" @click="updateInventory(product)"></button>
+            </div>
+        </div>
+        <h3>Add New Products</h3>
+        <div class="new-fields">
+            <div id="add-name">
+                <label for="">Product Name: </label>
+                <input type="text">
+            </div>
+            <div id="add-description">
+                <label for="">Description: </label>
+                <input type="text">
+            </div>
+            <div id="add-type">
+                <label for="">Type: </label>
+                Sticker / Hat / Pin
+            </div>
+            <div id="add-file">
+                <label for="">File: </label>
+                <input type="file" name="file" accept="image/*">
+            </div>
+            <div id="add-price">
+                <label for="">Price: </label>
+                <input type="text">
+            </div>
+            <div id="add-stripe-price">
+                <label for="">Stripe Price ID: </label>
+                <input type="text" required>
+            </div>
+            <div id="add-inventory">
+                <label for="">Stock: </label>
+                <input type="number">
             </div>
         </div>
     </section>`,
@@ -507,7 +538,7 @@ Vue.component('AdminPanel', {
         return {
             fullInventory: [],
             edit: null,
-            newStock: 0
+            editStock: 0
         }
     },
     methods: {
@@ -522,16 +553,17 @@ Vue.component('AdminPanel', {
             else return this.edit = productId
         },
         updateInventory(product) {
-            console.log(`we update ${product.name}`)
-            console.log(`from stock of ${product.inventory} to ${this.newStock}`)
             axios.patch(`/api/product/${product.id}/`,
-            { "inventory": this.newStock },
+            { "inventory": this.editStock },
             { headers: { 'X-CSRFToken': this.$parent.token } }
             ).then(res => {
-                this.newStock = 0
+                this.editStock = 0
                 this.edit = null
                 this.retrieveInventory()
             })
+        },
+        newProduct() {
+            console.log('making a new thing :)')
         }
     },
     mounted() {
