@@ -491,7 +491,8 @@ Vue.component('AdminPanel', {
     template: `
     <section>
         <h3>Item Management</h3>
-        <div v-for="product in fullInventory" class="admin-edit">
+        <section class="inventory-wrapper">
+        <div v-for="product in fullInventory" class="inventory-edit">
             <h5>[[product.name]] <i class="fa-solid fa-delete-left delete-item" @click="deleteProduct(product)"></i></h5>
             Current Stock: [[product.inventory]]
             <button class="fa-solid fa-wrench" @click="editToggle(product.id)"></button>
@@ -501,36 +502,42 @@ Vue.component('AdminPanel', {
                 <button class="fa-solid fa-floppy-disk" @click="updateInventory(product)"></button>
             </div>
         </div>
+        </section>
         <h3>Add New Products</h3>
         <div class="new-fields">
             <div id="add-name">
-                <label for="">Product Name: </label>
-                <input type="text">
+                <label for="name">Product Name: </label>
+                <input type="text" name="name" v-model="newProductName">
             </div>
             <div id="add-description">
-                <label for="">Description: </label>
-                <input type="text">
+                <label for="description">Description: </label>
+                <input type="text" name="description" v-model="newProductDesc">
             </div>
             <div id="add-type">
-                <label for="">Type: </label>
-                Sticker / Hat / Pin
+                <label for="type">Type: </label>
+                <select name="type" v-model="newProductType">
+                    <option value="S">Sticker</option>
+                    <option value="P">Pin</option>
+                    <option value="H">Hat</option>
+                </select>
             </div>
             <div id="add-file">
-                <label for="">File: </label>
-                <input type="file" name="file" accept="image/*">
+                <label for="file">File: </label>
+                <input type="file" name="file" ref="file" accept="image/*" @change="onFileChange">
             </div>
             <div id="add-price">
-                <label for="">Price: </label>
-                <input type="text">
+                <label for="price">Price: </label>
+                <input type="text" name="price" v-model="newProductPrice">
             </div>
             <div id="add-stripe-price">
-                <label for="">Stripe Price ID: </label>
-                <input type="text" required>
+                <label for="stripe">Stripe Price ID: </label>
+                <input type="text" name="stripe" v-model="newProductStripeCode" required>
             </div>
             <div id="add-inventory">
-                <label for="">Stock: </label>
-                <input type="number">
+                <label for="inventory">Stock: </label>
+                <input type="number" name="inventory" v-model="newProductStock">
             </div>
+            <button @click="newProduct">Upload</button>
         </div>
     </section>`,
     delimiters: ['[[', ']]'],
@@ -538,7 +545,15 @@ Vue.component('AdminPanel', {
         return {
             fullInventory: [],
             edit: null,
-            editStock: 0
+            editStock: 0,
+            newProductName: '',
+            newProductDesc: '',
+            newProductType: '',
+            newProductPrice: '',
+            newProductStripeCode: '',
+            newProductStock: 50,
+            newProductFile: '',
+            newFile: '',
         }
     },
     methods: {
@@ -563,8 +578,38 @@ Vue.component('AdminPanel', {
             })
         },
         newProduct() {
-            console.log('making a new thing :)')
-        }
+            if (this.newProductStripeCode === '') {
+                alert('Make sure you have a valid Stripe Code entered.')
+            } else {
+                let fd = new FormData()
+                fd.append('name', this.newProductName)
+                fd.append('description', this.newProductDesc)
+                fd.append('image', this.newFile)
+                fd.append('price', this.newProductPrice)
+                fd.append('type', this.newProductType)
+                fd.append('price_id', this.newProductStripeCode)
+                fd.append('inventory', this.newProductStock)
+
+                axios.post("/api/inventory/new/", fd,
+                { headers: { 'X-CSRFToken': this.$parent.token } })
+                .then(res => {
+                    console.log("SUCCESS");
+                    this.newProductName = ''
+                    this.newProductDesc = ''
+                    this.newProductType = ''
+                    this.newProductPrice = ''
+                    this.newProductStripeCode = ''
+                    this.newProductStock = 50
+                    this.retrieveInventory()
+                })
+                .catch(err => {
+                    console.log("FAILED");
+                });
+            }
+        },
+        onFileChange(e) {
+            this.newFile = e.target.files[0]
+        },
     },
     mounted() {
         this.retrieveInventory()

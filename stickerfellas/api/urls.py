@@ -6,6 +6,7 @@ urlpatterns = [
     path('all/', AllInventory.as_view()),
     path('current/', current_user, name='current_user'),
     path('inventory/new/', ItemCreate.as_view()),
+    path('inventory/delete/<int:pk>/', ItemDelete.as_view()),
     path('orders/', OrderHistories.as_view()),
     path('orders/new/', CreateOrder.as_view()),
     path('purchases/', PurchaseHistories.as_view()),

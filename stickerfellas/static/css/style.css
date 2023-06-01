@@ -138,7 +138,23 @@ header {
     background-color: var(--active-tab);
 }
 
-.admin-edit button{
+.inventory-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+}
+
+.inventory-edit {
+    text-align: center;
+    border: 1px solid var(--header-text);
+    border-radius: 3px;
+    padding: 5px;
+    height: 100px;
+    width: 180px;
+}
+
+.inventory-edit button{
     padding: 3px;
 }
 

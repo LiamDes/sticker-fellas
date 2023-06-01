@@ -1,6 +1,7 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 from products.models import *
 from accounts.models import *
 from .serializers import *
@@ -21,9 +22,28 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
         return ListItem.objects.filter(pk=self.kwargs['pk'])
 
 
-class ItemCreate(generics.ListCreateAPIView):
+class ItemCreate(generics.CreateAPIView):
+    parser_classes = [MultiPartParser]
     serializer_class = ItemSerializer
     queryset = ListItem.objects.all()
+    def post(self, request, format=None, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # Extract the image file from the request
+        image_file = request.data['image']
+        # Create a new instance of ListItem with the validated data
+        list_item = ListItem(**serializer.validated_data)
+        # Set the image field with the image file
+        list_item.image = image_file
+        # Save the ListItem instance
+        list_item.save()
+        return Response(serializer.data)
+
+
+class ItemDelete(generics.RetrieveDestroyAPIView):
+    serializer_class = ItemSerializer
+    def get_queryset(self):
+        return ListItem.objects.filter(pk=self.kwargs['pk'])
 
 
 class AllCategory(generics.ListAPIView):
