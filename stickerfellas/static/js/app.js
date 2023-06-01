@@ -561,7 +561,11 @@ Vue.component('AdminPanel', {
             axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
         deleteProduct(product) {
-            console.log(`why would you want to delete ${product.name}.`)
+            axios.delete(`/api/inventory/delete/${product.id}/`,
+            { headers: { 'X-CSRFToken': this.$parent.token } }
+            ).then(res => {
+                this.retrieveInventory()
+            })
         },
         editToggle(productId) {
             if (this.edit === productId) return this.edit = null
