@@ -489,7 +489,7 @@ Vue.component('ShoppingCart', {
 
 Vue.component('AdminPanel', {
     template: `
-    <section>
+    <section class="panel">
         <h3>Item Management</h3>
         <section class="inventory-wrapper">
         <div v-for="product in fullInventory" class="inventory-edit">
@@ -503,7 +503,7 @@ Vue.component('AdminPanel', {
             </div>
         </div>
         </section>
-        <h3>Add New Products</h3>
+        <h3>Add New Product</h3>
         <div class="new-fields">
             <div id="add-name">
                 <label for="name">Product Name: </label>
@@ -561,11 +561,11 @@ Vue.component('AdminPanel', {
             axios.get('/api/all/').then(res => this.fullInventory = res.data)
         },
         deleteProduct(product) {
-            axios.delete(`/api/inventory/delete/${product.id}/`,
-            { headers: { 'X-CSRFToken': this.$parent.token } }
-            ).then(res => {
-                this.retrieveInventory()
-            })
+            if (confirm(`Do you really want to delete ${product.name}?`)) {
+                axios.delete(`/api/inventory/delete/${product.id}/`,
+                { headers: { 'X-CSRFToken': this.$parent.token } }
+                ).then(res => this.retrieveInventory())
+            }
         },
         editToggle(productId) {
             if (this.edit === productId) return this.edit = null
@@ -582,34 +582,27 @@ Vue.component('AdminPanel', {
             })
         },
         newProduct() {
-            if (this.newProductStripeCode === '') {
-                alert('Make sure you have a valid Stripe Code entered.')
-            } else {
-                let fd = new FormData()
-                fd.append('name', this.newProductName)
-                fd.append('description', this.newProductDesc)
-                fd.append('image', this.newFile)
-                fd.append('price', this.newProductPrice)
-                fd.append('type', this.newProductType)
-                fd.append('price_id', this.newProductStripeCode)
-                fd.append('inventory', this.newProductStock)
+            let fd = new FormData()
+            fd.append('name', this.newProductName)
+            fd.append('description', this.newProductDesc)
+            fd.append('image', this.newFile)
+            fd.append('price', this.newProductPrice)
+            fd.append('type', this.newProductType)
+            fd.append('price_id', this.newProductStripeCode)
+            fd.append('inventory', this.newProductStock)
 
-                axios.post("/api/inventory/new/", fd,
-                { headers: { 'X-CSRFToken': this.$parent.token } })
-                .then(res => {
-                    console.log("SUCCESS");
-                    this.newProductName = ''
-                    this.newProductDesc = ''
-                    this.newProductType = ''
-                    this.newProductPrice = ''
-                    this.newProductStripeCode = ''
-                    this.newProductStock = 50
-                    this.retrieveInventory()
-                })
-                .catch(err => {
-                    console.log("FAILED");
-                });
-            }
+            axios.post("/api/inventory/new/", fd,
+            { headers: { 'X-CSRFToken': this.$parent.token } })
+            .then(res => {
+                this.newProductName = ''
+                this.newProductDesc = ''
+                this.newProductType = ''
+                this.newProductPrice = ''
+                this.newProductStripeCode = ''
+                this.newProductStock = 50
+                this.newFile = ''
+                this.retrieveInventory()
+            })
         },
         onFileChange(e) {
             this.newFile = e.target.files[0]

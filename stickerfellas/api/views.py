@@ -40,7 +40,7 @@ class ItemCreate(generics.CreateAPIView):
         return Response(serializer.data)
 
 
-class ItemDelete(generics.RetrieveDestroyAPIView):
+class ItemDelete(generics.DestroyAPIView):
     serializer_class = ItemSerializer
     def get_queryset(self):
         return ListItem.objects.filter(pk=self.kwargs['pk'])
