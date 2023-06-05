@@ -1,11 +1,12 @@
 Vue.component('CheckoutComplete', {
-    template: `<div class="hidden"></div>`,
+    template: `<div class="local-order">Sticker Fellas Reference Order #<strong>[[orderInfo.id]]</strong></div>`,
     data: () => {
         return {
             currentUser: {},
             orderInfo: {},
         }
     },
+    delimiters: ['[[', ']]'],
     methods: {
         updateHistory() {
             axios.get('/api/current/')
@@ -15,7 +16,6 @@ Vue.component('CheckoutComplete', {
                     // create an Order Object
                     axios.post('/api/orders/new/', {
                         "ordered_by": this.currentUser.id,
-                        // "product_ordered": this.cart
                     }, { headers: { 'X-CSRFToken': this.$parent.token } 
                     }).then(res => {
                         this.orderInfo = res.data
@@ -69,8 +69,6 @@ Vue.component('Replies', {
                     <p>[[t.comment_text]]</p>
                 </div>
             </div>
-            
-            
         </div>`,
     props: {
         review: Object
@@ -220,9 +218,6 @@ Vue.component('ProductReviews', {
         }
     },
     methods: {
-        // getReviews() {
-        //     axios.get(`/api/reviews/${this.listing.id}`).then(res => this.$parent.activeReviews = res.data.reverse())
-        // },
         async submitReview() {
             await axios.get('/api/current/').then(res => {
                 this.currentUser = res.data.username
@@ -247,15 +242,7 @@ Vue.component('ProductReviews', {
         dateString(date) {
             return new Date(date).toLocaleString()
         }
-    },
-    // watch: { 
-    //     listing() {
-    //       this.getReviews()
-    //     }
-    // },
-    // mounted() {
-    //     this.getReviews()
-    // }
+    }
 })
 
 Vue.component('OrderHistory', {
@@ -490,6 +477,132 @@ Vue.component('ShoppingCart', {
     }
 })
 
+Vue.component('AdminPanel', {
+    template: `
+    <section class="panel">
+        <h3>Item Management</h3>
+        <section class="inventory-wrapper">
+        <div v-for="product in fullInventory" class="inventory-edit">
+            <h5>[[product.name]] <i class="fa-solid fa-delete-left delete-item" @click="deleteProduct(product)"></i></h5>
+            Current Stock: [[product.inventory]]
+            <button class="fa-solid fa-wrench" @click="editToggle(product.id)"></button>
+            <div v-if="edit === product.id">
+                <label for="stockupdate">New Stock: </label>
+                <input type="number" v-model="editStock" min=0>
+                <button class="fa-solid fa-floppy-disk" @click="updateInventory(product)"></button>
+            </div>
+        </div>
+        </section>
+        <h3>Add New Product</h3>
+        <div class="new-fields">
+            <div id="add-name">
+                <label for="name">Product Name: </label>
+                <input type="text" name="name" v-model="newProductName">
+            </div>
+            <div id="add-description">
+                <label for="description">Description: </label>
+                <input type="text" name="description" v-model="newProductDesc">
+            </div>
+            <div id="add-type">
+                <label for="type">Type: </label>
+                <select name="type" v-model="newProductType">
+                    <option value="S">Sticker</option>
+                    <option value="P">Pin</option>
+                    <option value="H">Hat</option>
+                </select>
+            </div>
+            <div id="add-file">
+                <label for="file">File: </label>
+                <input type="file" name="file" ref="file" accept="image/*" @change="onFileChange">
+            </div>
+            <div id="add-price">
+                <label for="price">Price: </label>
+                <input type="text" name="price" v-model="newProductPrice">
+            </div>
+            <div id="add-stripe-price">
+                <label for="stripe">Stripe Price ID: </label>
+                <input type="text" name="stripe" v-model="newProductStripeCode" required>
+            </div>
+            <div id="add-inventory">
+                <label for="inventory">Stock: </label>
+                <input type="number" name="inventory" v-model="newProductStock" min=1>
+            </div>
+            <button @click="newProduct">Upload</button>
+        </div>
+    </section>`,
+    delimiters: ['[[', ']]'],
+    data: () => {
+        return {
+            fullInventory: [],
+            edit: null,
+            editStock: 0,
+            newProductName: '',
+            newProductDesc: '',
+            newProductType: '',
+            newProductPrice: '',
+            newProductStripeCode: '',
+            newProductStock: 50,
+            newProductFile: '',
+            newFile: '',
+        }
+    },
+    methods: {
+        retrieveInventory() {
+            axios.get('/api/all/').then(res => this.fullInventory = res.data)
+        },
+        deleteProduct(product) {
+            if (confirm(`Do you really want to delete ${product.name}?`)) {
+                axios.delete(`/api/inventory/delete/${product.id}/`,
+                { headers: { 'X-CSRFToken': this.$parent.token } }
+                ).then(res => this.retrieveInventory())
+            }
+        },
+        editToggle(productId) {
+            if (this.edit === productId) return this.edit = null
+            else return this.edit = productId
+        },
+        updateInventory(product) {
+            axios.patch(`/api/product/${product.id}/`,
+            { "inventory": this.editStock },
+            { headers: { 'X-CSRFToken': this.$parent.token } }
+            ).then(res => {
+                this.editStock = 0
+                this.edit = null
+                this.retrieveInventory()
+            })
+        },
+        newProduct() {
+            let fd = new FormData()
+            fd.append('name', this.newProductName)
+            fd.append('description', this.newProductDesc)
+            fd.append('image', this.newFile)
+            fd.append('price', this.newProductPrice)
+            fd.append('type', this.newProductType)
+            fd.append('price_id', this.newProductStripeCode)
+            fd.append('inventory', this.newProductStock)
+
+            axios.post("/api/inventory/new/", fd,
+            { headers: { 'X-CSRFToken': this.$parent.token } })
+            .then(res => {
+                this.newProductName = ''
+                this.newProductDesc = ''
+                this.newProductType = ''
+                this.newProductPrice = ''
+                this.newProductStripeCode = ''
+                this.newProductStock = 50
+                this.newFile = ''
+                this.retrieveInventory()
+            })
+        },
+        onFileChange(e) {
+            this.newFile = e.target.files[0]
+        },
+    },
+    mounted() {
+        this.retrieveInventory()
+    }
+})
+
 new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -499,6 +612,7 @@ new Vue({
         showCart: false,
         showProduct: false,
         showProfile: false,
+        showAdmin: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
@@ -520,6 +634,7 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
         },
         openShop(type) {
             this.lastFilter = type
@@ -528,6 +643,7 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
             this.getProducts(type)
         },
         openCart() {
@@ -536,6 +652,7 @@ new Vue({
             this.showCart = true
             this.showProduct = false
             this.showProfile = false
+            this.showAdmin = false
         },
         openProfile() {
             this.showHome = false
@@ -543,6 +660,15 @@ new Vue({
             this.showCart = false
             this.showProduct = false
             this.showProfile = true
+            this.showAdmin = false
+        },
+        openAdmin() {
+            this.showHome = false
+            this.showShop = false
+            this.showCart = false
+            this.showProduct = false
+            this.showProfile = false
+            this.showAdmin = true
         },
         async copyLink(productId) {
             const base = new URL(window.location.href)

@@ -6,7 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListItem
         fields = ['id', 'name', 'description', 'image', 
-                  'price', 'type', 'price_id', 'artist', 'inventory',
+                  'price', 'type', 'price_id','inventory',
                   'list_date', 'average_rating']
         
 
@@ -34,7 +34,7 @@ class ReplyWriteSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['username', 'id']
+        fields = ['username', 'id', 'is_staff']
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
@@ -57,13 +57,7 @@ class FullOrderSerializer(serializers.ModelSerializer):
         model = FullOrder
         fields = ['id','ordered_by','order_date','product_ordered']
 
-    # def create(self, validated_data):
-    #     product_data = validated_data.pop('product_ordered')
-    #     order = FullOrder.objects.create(**validated_data)
-    #     for purchase_data in product_data:
-    #         Purchase.objects.create(order=order, **purchase_data)
-    #     return order
-    
+
 
 class OrderWriteSerializer(serializers.ModelSerializer):
     class Meta:
