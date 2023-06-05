@@ -16,7 +16,6 @@ Vue.component('CheckoutComplete', {
                     // create an Order Object
                     axios.post('/api/orders/new/', {
                         "ordered_by": this.currentUser.id,
-                        // "product_ordered": this.cart
                     }, { headers: { 'X-CSRFToken': this.$parent.token } 
                     }).then(res => {
                         this.orderInfo = res.data
@@ -70,8 +69,6 @@ Vue.component('Replies', {
                     <p>[[t.comment_text]]</p>
                 </div>
             </div>
-            
-            
         </div>`,
     props: {
         review: Object
@@ -221,9 +218,6 @@ Vue.component('ProductReviews', {
         }
     },
     methods: {
-        // getReviews() {
-        //     axios.get(`/api/reviews/${this.listing.id}`).then(res => this.$parent.activeReviews = res.data.reverse())
-        // },
         async submitReview() {
             await axios.get('/api/current/').then(res => {
                 this.currentUser = res.data.username
@@ -248,12 +242,7 @@ Vue.component('ProductReviews', {
         dateString(date) {
             return new Date(date).toLocaleString()
         }
-    },
-    // watch: { 
-    //     listing() {
-    //       this.getReviews()
-    //     }
-    // },
+    }
 })
 
 Vue.component('OrderHistory', {
