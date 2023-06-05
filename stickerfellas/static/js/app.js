@@ -1,11 +1,12 @@
 Vue.component('CheckoutComplete', {
-    template: `<div class="hidden"></div>`,
+    template: `<div class="local-order">Sticker Fellas Reference Order #<strong>[[orderInfo.id]]</strong></div>`,
     data: () => {
         return {
             currentUser: {},
             orderInfo: {},
         }
     },
+    delimiters: ['[[', ']]'],
     methods: {
         updateHistory() {
             axios.get('/api/current/')
@@ -498,7 +499,7 @@ Vue.component('AdminPanel', {
             <button class="fa-solid fa-wrench" @click="editToggle(product.id)"></button>
             <div v-if="edit === product.id">
                 <label for="stockupdate">New Stock: </label>
-                <input type="number" v-model="editStock">
+                <input type="number" v-model="editStock" min=0>
                 <button class="fa-solid fa-floppy-disk" @click="updateInventory(product)"></button>
             </div>
         </div>
@@ -535,7 +536,7 @@ Vue.component('AdminPanel', {
             </div>
             <div id="add-inventory">
                 <label for="inventory">Stock: </label>
-                <input type="number" name="inventory" v-model="newProductStock">
+                <input type="number" name="inventory" v-model="newProductStock" min=1>
             </div>
             <button @click="newProduct">Upload</button>
         </div>
