@@ -209,10 +209,11 @@ Vue.component('ProductReviews', {
                     </div>
                     <label for="review-title"></label>
                     <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
-                    <label for="review-description"></label>
                     <textarea v-model="newReviewDescription" placeholder="Your Review" @keyup="characterLimitCount"></textarea>
                     <span :class="{counterror : countError }">[[remainingCount]]</span>
                     <button @click="submitReview" id="reviewbutton">SEND</button>
+                    <p v-if="showError && errorlog.title" class="error">Title field must not be Null</p>
+                    <label for="review-description"></label>
                 </fieldset>
             </div>
         </div>`,
@@ -230,7 +231,9 @@ Vue.component('ProductReviews', {
             remainingCount: 1000,
             countError: false,
             newReviewRating: 0,
-            currentUser: {}
+            currentUser: {},
+            errorlog: {},
+            showError: false,
         }
     },
     methods: {
@@ -253,6 +256,13 @@ Vue.component('ProductReviews', {
                     this.newReviewTitle = null
                     this.newReviewDescription = null
                     this.newReviewRating = 0
+                })
+                .catch(err => {
+                    this.errorlog = JSON.parse(err.request.response)
+                    this.showError = true
+                    setTimeout(() => {
+                        this.showError = false
+                    }, 3000)
                 })
         },
         characterLimitCount() {
