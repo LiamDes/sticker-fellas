@@ -46,7 +46,8 @@ Vue.component('Replies', {
             <i class="fa-solid fa-reply" @click="replying = !replying" v-if="currentUser != 'Anonymous'" title="Reply to this review!"></i>
             <div v-if="replying" class="reply-create">
                 <h5>Replying as [[currentUser.username]]</h5>
-                <textarea v-model="replyText"></textarea>
+                <textarea v-model="replyText" @keyup="characterLimitCount"></textarea>
+                <span :class="{counterror : countReplyError }">[[remainingReplyCount]]</span>
                 <button @click="addReply">Send</button>
             </div>
             <div v-for="reply in replies" v-if="!reply.secondary_reply" class="reply-wrapper">
@@ -58,7 +59,8 @@ Vue.component('Replies', {
                     <i class="fa-solid fa-reply" @click="threadToggle(reply.id)" v-if="currentUser != 'Anonymous'" title="Reply to this comment!"></i>
                     <div v-if="replyTo === reply.id" class="reply-create">
                         <h5>Replying as [[currentUser.username]]</h5>
-                        <textarea v-model="threadText"></textarea>
+                        <textarea v-model="threadText" @keyup="characterLimitCount"></textarea>
+                        <span :class="{counterror : countThreadError }">[[remainingThreadCount]]</span>
                         <button @click="addThreadReply(reply.id)">Send</button>
                     </div>
                 </div>
@@ -82,6 +84,11 @@ Vue.component('Replies', {
             replying: false,
             replyTo: null,
             replyText: '',
+            maxCount: 400,
+            remainingReplyCount: 400,
+            remainingThreadCount: 400,
+            countReplyError: false,
+            countThreadError: false,
             threadText: '',
         }
     },
@@ -128,6 +135,12 @@ Vue.component('Replies', {
                 })
             }
         },
+        characterLimitCount() {
+            this.remainingReplyCount = this.maxCount - this.replyText.length
+            this.remainingThreadCount = this.maxCount - this.threadText.length
+            this.countReplyError = this.remainingReplyCount < 0
+            this.countThreadError = this.remainingThreadCount < 0
+        },
         authenticate() {
             axios.get('/api/current/').then(res => {
                 this.currentUser = res.data
@@ -159,11 +172,10 @@ Vue.component('ProductReviews', {
             <div v-for="review in reviews" class="review-contents">
                 <h3>
                     [[review.title]] 
-                    <span v-for="star in review.rating">
+                    <span v-for="star in review.rating" class="review-stars">
                         <i class="fa-solid fa-star"></i>
-                    </span>
-                    <span v-for="star in (5 - review.rating)">
-                        <i class="fa-regular fa-star"></i>
+                    </span><span v-for="star in (5 - review.rating)" class="review-nostar">
+                    <i class="fa-solid fa-star"></i>
                     </span>
                 </h3>
                 <cite>by [[review.user]] 
@@ -198,7 +210,8 @@ Vue.component('ProductReviews', {
                     <label for="review-title"></label>
                     <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
                     <label for="review-description"></label>
-                    <textarea v-model="newReviewDescription" placeholder="Your Review"></textarea>
+                    <textarea v-model="newReviewDescription" placeholder="Your Review" @keyup="characterLimitCount"></textarea>
+                    <span :class="{counterror : countError }">[[remainingCount]]</span>
                     <button @click="submitReview" id="reviewbutton">SEND</button>
                 </fieldset>
             </div>
@@ -213,6 +226,9 @@ Vue.component('ProductReviews', {
             hovering: null,
             newReviewTitle: null,
             newReviewDescription: null,
+            maxCount: 1000,
+            remainingCount: 1000,
+            countError: false,
             newReviewRating: 0,
             currentUser: {}
         }
@@ -238,6 +254,10 @@ Vue.component('ProductReviews', {
                     this.newReviewDescription = null
                     this.newReviewRating = 0
                 })
+        },
+        characterLimitCount() {
+            this.remainingCount = this.maxCount - this.newReviewDescription.length
+            this.countError = this.remainingCount < 0;
         },
         dateString(date) {
             return new Date(date).toLocaleString()
@@ -497,15 +517,21 @@ Vue.component('AdminPanel', {
         <div class="new-fields">
             <div id="add-name">
                 <label for="name">Product Name: </label>
-                <input type="text" name="name" v-model="newProductName">
+                <input type="text" name="name" v-model="newProductName" required>
+                <div v-if="showError && errorlog.name" class="error">
+                [[ errorlog.name[0] ]]
+                </div>
             </div>
             <div id="add-description">
                 <label for="description">Description: </label>
-                <input type="text" name="description" v-model="newProductDesc">
+                <input type="text" name="description" v-model="newProductDesc" required>
+                <div v-if="showError && errorlog.description" class="error">
+                [[ errorlog.description[0] ]]
+                </div>
             </div>
             <div id="add-type">
                 <label for="type">Type: </label>
-                <select name="type" v-model="newProductType">
+                <select name="type" v-model="newProductType" required>
                     <option value="S">Sticker</option>
                     <option value="P">Pin</option>
                     <option value="H">Hat</option>
@@ -513,19 +539,31 @@ Vue.component('AdminPanel', {
             </div>
             <div id="add-file">
                 <label for="file">File: </label>
-                <input type="file" name="file" ref="file" accept="image/*" @change="onFileChange">
+                <input type="file" name="file" ref="file" accept="image/*" @change="onFileChange" required>
+                <div v-if="showError && errorlog.image" class="error">
+                [[ errorlog.image[0] ]]
+                </div>
             </div>
             <div id="add-price">
                 <label for="price">Price: </label>
-                <input type="text" name="price" v-model="newProductPrice">
+                <input type="text" name="price" v-model="newProductPrice" required>
+                <div v-if="showError && errorlog.price" class="error">
+                [[ errorlog.price[0] ]]
+                </div>
             </div>
             <div id="add-stripe-price">
                 <label for="stripe">Stripe Price ID: </label>
                 <input type="text" name="stripe" v-model="newProductStripeCode" required>
+                <div v-if="showError && errorlog.price_id" class="error">
+                [[ errorlog.price_id[0] ]]
+                </div>
             </div>
             <div id="add-inventory">
                 <label for="inventory">Stock: </label>
-                <input type="number" name="inventory" v-model="newProductStock" min=1>
+                <input type="number" name="inventory" v-model="newProductStock" min=1 required>
+                <div v-if="showError && errorlog.inventory" class="error">
+                [[ errorlog.inventory[0] ]]
+                </div>
             </div>
             <button @click="newProduct">Upload</button>
         </div>
@@ -544,6 +582,8 @@ Vue.component('AdminPanel', {
             newProductStock: 50,
             newProductFile: '',
             newFile: '',
+            errorlog: {},
+            showError: false
         }
     },
     methods: {
@@ -593,6 +633,13 @@ Vue.component('AdminPanel', {
                 this.newFile = ''
                 this.retrieveInventory()
             })
+            .catch(err => {
+                this.errorlog = JSON.parse(err.request.response)
+                this.showError = true
+                setTimeout(() => {
+                    this.showError = false
+                }, 3000)
+            })
         },
         onFileChange(e) {
             this.newFile = e.target.files[0]
@@ -613,6 +660,7 @@ new Vue({
         showProduct: false,
         showProfile: false,
         showAdmin: false,
+        menuHover: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
