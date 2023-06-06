@@ -9,6 +9,7 @@
     --header-text: #0e8178;
     --active-tab: #03423d;
     --error: #772727;
+    --stars: #ffc766;
 
     font-family: 'Barlow', sans-serif;
     font-size: 14pt;
@@ -19,12 +20,16 @@
     overflow-x: hidden;
 }
 
-h1 {
+h1, .homedirect {
     margin: 0;
     font-family: 'Darumadrop One', cursive;
     font-size: 36pt;
     color: var(--background);
     -webkit-text-stroke: 1px var(--main-text);
+}
+
+header h1 {
+    cursor: pointer;
 }
 
 h3 {
@@ -39,11 +44,6 @@ h5 {
 a {
     text-decoration: none;
     color: var(--main-text);
-}
-
-.homedirect {
-    color: var(--background);
-    -webkit-text-stroke: 1px var(--main-text);
 }
 
 body {
@@ -122,19 +122,20 @@ header {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
 }
 
-.browsebar>*{
-    color: var(--background);
-    background-color: var(--header-text);
-    border: 1px solid var(--accent);
+.browsebar div{
+    color: var(--main-text);
+    background-color: var(--accent);
+    border: 1px solid var(--header-text);
     border-radius: 4px;
     width: 5em;
     text-align: center;
     cursor: pointer;
 }
 
-.browsebar>*:active{
+.browsebar div:active{
     background-color: var(--active-tab);
 }
 
@@ -158,20 +159,20 @@ header {
     width: 180px;
 }
 
-.inventory-edit button{
-    padding: 3px;
-}
-
 .new-fields {
     border-radius: 5px;
     background-color: var(--background);
     margin: auto;
-    width: fit-content;
+    max-width: 350px;
     padding: 0.3em 1em;
     filter: drop-shadow(0px 1px 2px var(--header-text));
 
     display: flex;
     flex-direction: column;
+}
+
+.error {
+    font-size: 10pt;
 }
 
 .new-fields input, select{
@@ -196,8 +197,8 @@ input[type=file]::before {
     content: 'Select';
     display: inline-block;
     background-color: var(--header-text);
-    border: 1px solid var(--header-text);
-    border-radius: 3px;
+    border: 2px outset var(--active-tab);
+    border-radius: 4px;
     padding: 5px 8px;
     outline: none;
     white-space: nowrap;
@@ -207,11 +208,11 @@ input[type=file]::before {
 }
 
 input[type=file]:hover::before {
-    border-color: black;
+    border-color: var(--main-text);
 }
 
 input[type=file]:active::before {
-    background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+    background-color: var(--active-tab);
 }
 
 .primary-banner {
@@ -231,6 +232,7 @@ input[type=file]:active::before {
 }
 
 .primary-header {
+    color: var(--header-text);
     grid-area: header;
     font-size: 26pt;
 }
@@ -286,10 +288,17 @@ input[type=file]:active::before {
 }
 
 button {
+    cursor: pointer;
     background-color: var(--header-text);
     color: var(--background);
     border-radius: 4px;
     border: 2px outset var(--active-tab);
+    padding: 3px;
+}
+
+button:active {
+    border: 2px inset var(--active-tab);
+    background-color: var(--active-tab);
 }
 
 details {
@@ -382,6 +391,16 @@ input[type=number] {
     padding: 0.6em;
 }
 
+.review-stars {
+    color: var(--stars);
+    -webkit-text-stroke: 2px var(--main-text);
+}
+
+.review-nostar {
+    color: var(--background);
+    -webkit-text-stroke: 2px var(--main-text);
+}
+
 .reply-wrapper {
     display: flex;
     flex-direction: column;
@@ -405,6 +424,12 @@ input[type=number] {
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+.reply-create span {
+    font-size: 8pt;
+    align-self: flex-end;
+    padding-right: 20%;
 }
 
 .reply-create button {
@@ -447,7 +472,7 @@ input[type=number] {
 }
 
 .fullstar {
-    color: #ffc766;
+    color: var(--stars);
 }
 
 fieldset {
@@ -480,7 +505,17 @@ fieldset input[type=text], textarea {
     padding: 3px 5px;
 }
 
-input:focus, textarea:focus, select:focus {
+fieldset span {
+    font-size: 8pt;
+    align-self: flex-end;
+    padding-right: 10%;
+}
+
+.counterror, .error {
+    color: var(--error);
+}
+
+input:focus:not([type=file]), textarea:focus, select:focus {
     outline: 2px inset var(--accent);
 }
 
@@ -630,6 +665,18 @@ footer {
 /* Tablet Display */
 @media screen and (min-width: 680px) {
 
+    .browsebar {
+        justify-content: space-between;
+        gap: 5px;
+        padding: 5px;
+    }
+
+    .browsebar div {
+        height: 2rem;
+        line-height: 2rem;
+        flex-grow: 1;
+    }
+
     .primary-banner {
     grid-template-areas: 
         'promo header'
@@ -688,18 +735,17 @@ footer {
         gap: 0px;
         padding: 0;
         position: relative;
+        justify-content: unset;
     }
 
     .browsebar div {
         width: 150px;
-        height: 2rem;
-        line-height: 2rem;
-
+        flex-grow: 0;
         background-color: var(--background);
         border-top: 0px;
         border-bottom: 0;
         border-radius: 0;
-        color: var(--main-text);
+        border-color: var(--accent);
     }
 
     .browsebar div:first-child {
@@ -724,8 +770,28 @@ footer {
         text-shadow: var(--background) 1px 1px;
     }
 
+    .browsebar div:active {
+        background-color: var(--header-text);
+        color: var(--background);
+        text-shadow: var(--background) 1px 1px;
+    }
+
     .admin-only {
         position: absolute;
         right: 0px;
     }
 }
+
+@media (prefers-reduced-motion) {
+    .addingitem {
+        animation-name: unset;
+    }
+
+    .secondary-banner-promo:hover {
+        transition: unset;
+    }
+
+    .outmessage {
+        animation-name: unset;
+    }
+  }

@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db.models import Avg
+
+stripe_validator = RegexValidator(r'price_([a-zA-Z0-9_]){24}', 'Stripe Price ID must start with "price_" and contain 24 digits/numbers.')
 
 class ListItem(models.Model):
     PRODUCT_TYPES=(('S','sticker'),('P','pin'),('H','hat'))
@@ -11,7 +13,7 @@ class ListItem(models.Model):
     image = models.ImageField()
     price = models.DecimalField(max_digits=5,decimal_places=2,default=0.99)
     type = models.CharField(choices=PRODUCT_TYPES,max_length=1,default="s")
-    price_id = models.CharField(max_length=300)
+    price_id = models.CharField(max_length=300, validators=[stripe_validator])
     list_date = models.DateField(auto_now_add=True)
     inventory = models.IntegerField(verbose_name="Items Available",default=50,
                                     validators=[MaxValueValidator(99),MinValueValidator(0)])
