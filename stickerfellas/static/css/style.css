@@ -644,7 +644,19 @@ ul {
 }
 
 footer {
+    background-color: var(--accent);
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+}
+
+footer span:first-child {
     font-size: 8pt;
+}
+
+footer span:not(:first-child) {
+    cursor: pointer;
+    font-weight: 700;
 }
 
 ::-webkit-scrollbar {
