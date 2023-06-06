@@ -391,6 +391,10 @@ input[type=number] {
     padding: 0.6em;
 }
 
+.review-contents p, .reply p {
+    white-space: pre-wrap;
+}
+
 .review-stars {
     color: var(--stars);
     -webkit-text-stroke: 2px var(--main-text);

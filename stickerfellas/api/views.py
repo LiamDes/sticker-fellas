@@ -1,7 +1,7 @@
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FileUploadParser
+from rest_framework.parsers import MultiPartParser
 from products.models import *
 from accounts.models import *
 from .serializers import *
@@ -35,7 +35,6 @@ class ItemCreate(generics.CreateAPIView):
         list_item = ListItem(**serializer.validated_data)
         # Set the image field with the image file
         list_item.image = image_file
-        # Save the ListItem instance
         list_item.save()
         return Response(serializer.data)
 
@@ -59,13 +58,13 @@ class Reviews(generics.ListAPIView):
     def get_queryset(self):
         product = self.kwargs.get("product_id")
         return ProductReview.objects.filter(product=product)
-    
+
 
 class CreateReview(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     def get_queryset(self):
         return ProductReview.objects.all()
-    
+
 
 class Replies(generics.ListAPIView):
     serializer_class = ReplySerializer
@@ -73,15 +72,14 @@ class Replies(generics.ListAPIView):
     def get_queryset(self):
         reply = self.kwargs.get("reply_to_id")
         thread = self.kwargs.get("secondary_reply")
-        print(thread)
         return ReviewReply.objects.filter(reply_to=reply)
-    
+
 
 class CreateReply(generics.CreateAPIView):
     serializer_class = ReplyWriteSerializer
     def get_queryset(self):
         return ReviewReply.objects.all()
-    
+
 
 @api_view(['GET'])
 def current_user(request):
@@ -153,4 +151,3 @@ def checkout_session(request):
         return Response({'sessionId': checkout_session['id']})
     except Exception as e:
         return Response({'error': str(e)})
-    

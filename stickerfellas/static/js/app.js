@@ -26,7 +26,7 @@ Vue.component('CheckoutComplete', {
                                 "product": item.product.id,
                                 "quantity": item.quantity
                             }, { headers: { 'X-CSRFToken': this.$parent.token }})
-                            }) 
+                        }) 
                     })
                 }
             })
@@ -209,10 +209,11 @@ Vue.component('ProductReviews', {
                     </div>
                     <label for="review-title"></label>
                     <input type="text" v-model="newReviewTitle" placeholder="Review Title"/>
-                    <label for="review-description"></label>
                     <textarea v-model="newReviewDescription" placeholder="Your Review" @keyup="characterLimitCount"></textarea>
                     <span :class="{counterror : countError }">[[remainingCount]]</span>
                     <button @click="submitReview" id="reviewbutton">SEND</button>
+                    <p v-if="showError && errorlog.title" class="error">Title field must not be Null</p>
+                    <label for="review-description"></label>
                 </fieldset>
             </div>
         </div>`,
@@ -230,7 +231,9 @@ Vue.component('ProductReviews', {
             remainingCount: 1000,
             countError: false,
             newReviewRating: 0,
-            currentUser: {}
+            currentUser: {},
+            errorlog: {},
+            showError: false,
         }
     },
     methods: {
@@ -239,7 +242,7 @@ Vue.component('ProductReviews', {
                 this.currentUser = res.data.username
                 if (this.currentUser === '') this.currentUser = 'Anonymous'
             })
-            
+
             axios.post(`/api/reviews/new/`, {
                 "title": this.newReviewTitle,
                 "description": this.newReviewDescription,
@@ -253,6 +256,13 @@ Vue.component('ProductReviews', {
                     this.newReviewTitle = null
                     this.newReviewDescription = null
                     this.newReviewRating = 0
+                })
+                .catch(err => {
+                    this.errorlog = JSON.parse(err.request.response)
+                    this.showError = true
+                    setTimeout(() => {
+                        this.showError = false
+                    }, 3000)
                 })
         },
         characterLimitCount() {
@@ -336,7 +346,7 @@ Vue.component('ItemListings', {
     @click="openProduct(listing.id)" :class="{out: isOut}">
         <div v-if="isOut" class="stock-notice">SOLD OUT</div>
         <h3>[[listing.name]]</h3>
-        <img :src="listing.image" class="itempreview"/>
+        <img :src="listing.image" class="itempreview" loading="lazy"/>
         <button v-if="hovering && !isOut" @click.stop="cartFromPreview">Add to Cart</button>
     </div>`,
     props: {

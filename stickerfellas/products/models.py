@@ -34,7 +34,7 @@ class ProductReview(models.Model):
     posted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f'{self.product}: {self.rating}/5'
+        return f'{self.product}: {self.rating}/5 by {self.user}'
 
 
 class ReviewReply(models.Model):
@@ -45,7 +45,7 @@ class ReviewReply(models.Model):
     secondary_reply = models.ForeignKey('self',on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self) -> str:
-        return f'Reply to Review: {self.reply_to}'
+        return f'Reply to {self.reply_to}: {self.comment_text}'
 
 
 class FullOrder(models.Model):
@@ -54,7 +54,7 @@ class FullOrder(models.Model):
     product_ordered = models.ManyToManyField(ListItem,through="Purchase")
 
     def __str__(self) -> str:
-        return f'Order by {self.ordered_by} on {self.order_date}'
+        return f'Order by {self.ordered_by}'
 
 
 class Purchase(models.Model):

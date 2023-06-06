@@ -1,0 +1,18 @@
+.headerwaves {
+    display: none;
+}
+
+.secondary-banners {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: unset;
+    justify-content: space-around;
+}
+
+.review-contents fieldset {
+    display: none;
+}
+
+.review-nostar {
+    color: #fff;
+}
