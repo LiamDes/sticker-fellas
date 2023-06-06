@@ -58,13 +58,13 @@ class Reviews(generics.ListAPIView):
     def get_queryset(self):
         product = self.kwargs.get("product_id")
         return ProductReview.objects.filter(product=product)
-    
+
 
 class CreateReview(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     def get_queryset(self):
         return ProductReview.objects.all()
-    
+
 
 class Replies(generics.ListAPIView):
     serializer_class = ReplySerializer
@@ -73,13 +73,13 @@ class Replies(generics.ListAPIView):
         reply = self.kwargs.get("reply_to_id")
         thread = self.kwargs.get("secondary_reply")
         return ReviewReply.objects.filter(reply_to=reply)
-    
+
 
 class CreateReply(generics.CreateAPIView):
     serializer_class = ReplyWriteSerializer
     def get_queryset(self):
         return ReviewReply.objects.all()
-    
+
 
 @api_view(['GET'])
 def current_user(request):
@@ -151,4 +151,3 @@ def checkout_session(request):
         return Response({'sessionId': checkout_session['id']})
     except Exception as e:
         return Response({'error': str(e)})
-    

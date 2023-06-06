@@ -26,7 +26,7 @@ Vue.component('CheckoutComplete', {
                                 "product": item.product.id,
                                 "quantity": item.quantity
                             }, { headers: { 'X-CSRFToken': this.$parent.token }})
-                            }) 
+                        }) 
                     })
                 }
             })
@@ -239,7 +239,7 @@ Vue.component('ProductReviews', {
                 this.currentUser = res.data.username
                 if (this.currentUser === '') this.currentUser = 'Anonymous'
             })
-            
+
             axios.post(`/api/reviews/new/`, {
                 "title": this.newReviewTitle,
                 "description": this.newReviewDescription,
