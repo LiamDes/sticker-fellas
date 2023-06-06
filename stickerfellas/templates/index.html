@@ -9,7 +9,8 @@
     <!-- ref files -->
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" >
     <script src="https://kit.fontawesome.com/03c91ce9d4.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
@@ -69,16 +70,16 @@
             <article class="homepage" :class="{'fullmenu':showHome}">
                 <section class="primary-banner" @click="openShop('S')">
                     <h1 class="primary-header">STICKERS</h1>
-                    <img src="{% static 'ad/primary.png' %}" alt="sticker promo image" class="primary-banner-promo">
+                    <img src="{% static 'ad/primary.png' %}" alt="sticker promo image" class="primary-banner-promo" loading="lazy">
                     <div class="primary-block">Animal designs and more with our die-cut stickers!</div>
                 </section>
                 <section class="secondary-banners">
                     <div id="small-ad-1" class="secondary-ad" @click="openShop('H')">
                         <h3>FUNNY HATS</h3>
-                        <img src="{% static 'ad/ad_hat.png' %}" alt="hat promo image" class="secondary-banner-promo">
+                        <img src="{% static 'ad/ad_hat.png' %}" alt="hat promo image" class="secondary-banner-promo" loading="lazy">
                     </div>
                     <div id="small-ad-2" class="secondary-ad" @click="openShop('P')">
-                        <img src="{% static 'ad/ad_pin.png' %}" alt="pin promo image" class="secondary-banner-promo">
+                        <img src="{% static 'ad/ad_pin.png' %}" alt="pin promo image" class="secondary-banner-promo" loading="lazy">
                         <h3>AMAZING PINS</h3>
                     </div>
                     <div id="small-ad-3" class="secondary-ad" @click="openShop('lowstock')">
@@ -126,7 +127,7 @@
                         <i class="fa-solid fa-xmark" @click="openShop(lastFilter)"></i>
                     </div>
                     <h1>[[activeProduct.name]]</h1>
-                    <img :src="activeProduct.image" alt="image of product"/>
+                    <img :src="activeProduct.image" alt="image of product" loading="lazy"/>
                     <div class="price">[[activeProduct.price]]</div>
                     <caption>[[activeProduct.description]]</caption>
                     <p v-if="activeProduct.average_rating != 0">

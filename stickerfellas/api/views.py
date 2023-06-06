@@ -35,7 +35,6 @@ class ItemCreate(generics.CreateAPIView):
         list_item = ListItem(**serializer.validated_data)
         # Set the image field with the image file
         list_item.image = image_file
-        # Save the ListItem instance
         list_item.save()
         return Response(serializer.data)
 
@@ -73,7 +72,6 @@ class Replies(generics.ListAPIView):
     def get_queryset(self):
         reply = self.kwargs.get("reply_to_id")
         thread = self.kwargs.get("secondary_reply")
-        print(thread)
         return ReviewReply.objects.filter(reply_to=reply)
     
 

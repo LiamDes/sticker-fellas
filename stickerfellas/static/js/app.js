@@ -336,7 +336,7 @@ Vue.component('ItemListings', {
     @click="openProduct(listing.id)" :class="{out: isOut}">
         <div v-if="isOut" class="stock-notice">SOLD OUT</div>
         <h3>[[listing.name]]</h3>
-        <img :src="listing.image" class="itempreview"/>
+        <img :src="listing.image" class="itempreview" loading="lazy"/>
         <button v-if="hovering && !isOut" @click.stop="cartFromPreview">Add to Cart</button>
     </div>`,
     props: {
