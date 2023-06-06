@@ -1,7 +1,7 @@
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FileUploadParser
+from rest_framework.parsers import MultiPartParser
 from products.models import *
 from accounts.models import *
 from .serializers import *

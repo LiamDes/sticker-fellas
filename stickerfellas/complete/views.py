@@ -1,10 +1,5 @@
-from rest_framework import generics
 from rest_framework.decorators import api_view
 from django.shortcuts import render
-from rest_framework.response import Response
-from products.models import *
-from django.contrib.auth import get_user_model
-from django.conf import settings
 import stripe
 
 stripe.api_key = 'sk_test_51N9EumJgrzFtfn7GNSxzdC7QO5dPdtMxsIq3CYtmJk6KX67JaN54eNGkmmKCElRGnsdoCtZ1Ejedk9pdgfoQUjM500V6U9uiHc'
