@@ -50,12 +50,15 @@
 
         {% block navbar %}
         <nav class="contents browsebar">
-            <div @click="openShop(null)">SHOP ALL</div>
-            <div @click="openShop('S')">STICKERS</div>
-            <div @click="openShop('P')">PINS</div>
-            <div @click="openShop('H')">HATS</div> 
+            <div @click="openShop(null)" @mouseover="menuHover = true" @mouseleave="menuHover = false">SHOP ALL</div>
+            <div @click="openShop('S')" class="largeonly-hidden" :class="{submenu: menuHover}"
+            @mouseover="menuHover = true" @mouseleave="menuHover = false">STICKERS</div>
+            <div @click="openShop('P')" class="largeonly-hidden" :class="{submenu: menuHover}"
+            @mouseover="menuHover = true" @mouseleave="menuHover = false">PINS</div>
+            <div @click="openShop('H')" class="largeonly-hidden" :class="{submenu: menuHover}"
+            @mouseover="menuHover = true" @mouseleave="menuHover = false">HATS</div> 
             {% if user.is_staff %}
-            <div @click="openAdmin">MANAGE</div>
+            <div @click="openAdmin" class="admin-only">MANAGE</div>
             {% endif %}
         </nav>
         {% endblock %}
@@ -64,7 +67,6 @@
 
             {% block content %}
             <article class="homepage" :class="{'fullmenu':showHome}">
-                <!-- Main Page display TODO: classbind-->
                 <section class="primary-banner" @click="openShop('S')">
                     <h1 class="primary-header">STICKERS</h1>
                     <img src="{% static 'ad/primary.png' %}" alt="sticker promo image" class="primary-banner-promo">

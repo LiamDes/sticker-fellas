@@ -613,6 +613,7 @@ new Vue({
         showProduct: false,
         showProfile: false,
         showAdmin: false,
+        menuHover: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
