@@ -644,7 +644,58 @@ ul {
 }
 
 footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+}
+
+footer span {
     font-size: 8pt;
+}
+
+footer a {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.modal {
+    background-color: var(--background);
+    padding: 10px;
+    border: 2px solid var(--accent);
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 2em auto;
+}
+
+.modal p {
+    padding: 0 1em;
+    text-align: justify;
+}
+
+.modal ol {
+    padding-right: 1em;
+}
+
+.modal li {
+    font-weight: 700;
+    font-size: 14pt;
+    padding: 0.5em 0;
+}
+
+.modal li > ul li {
+    font-weight: 200;
+    font-size: 12pt;
+    padding: 0;
 }
 
 ::-webkit-scrollbar {

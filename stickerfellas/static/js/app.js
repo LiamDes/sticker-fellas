@@ -1,3 +1,61 @@
+Vue.component('FooterModals', {
+    template: `
+        <div class="overlay" @click.self="closeModal">
+            <section class="modal">
+                <h3>[[$parent.content]]</h3>
+                <ol v-if="$parent.content === 'FAQ'">
+                <li>
+                    <ul>
+                    Is this a real shop?
+                        <li>No.</li>
+                        <li>Please don't input any real credit card info into the Stripe test system.</li>
+                        <li>For testing purposes, Stripe provides a <a href="https://stripe.com/docs/testing?testing-method=card-numbers">list of fake cards</a> to try out.</li>
+                    </ul>
+                </li>
+                <li>
+                    <ul>
+                    Why isn't this a real shop?
+                        <li>The products aren't real.</li>
+                    </ul>
+                </li>
+                <li>
+                    <ul>
+                    How long should shipping take?
+                        <li>Hypothetically, you'd get shipping info if these were real products for sale. I hope this business would get items packaged and labeled within 1 business day.</li>
+                    </ul>
+                </li>
+                <li>
+                    <ul>
+                    Why should I make an account?
+                        <li>Anonymous users are free to leave product reviews, but if you want to maintain an order history- the account does the work for you.</li>
+                        <li>Plus, you can't reply to reviews without an account. For fun, there are also titles on your account page that you can earn for how many purchases you've made.</li>
+                    </ul>
+                </li>
+                <li>
+                    <ul>
+                    I found something broken.
+                        <li>Whoops.</li>
+                        <li>Please <a href="mailto: deshaiesash@gmail.com">let me know</a>, thanks for the catch.</li>
+                    </ul>
+                </li>
+                </ol>
+                <p v-else>
+                Sticker Fellas is a mock e-commerce app made to demonstrate work abilities using a third party payment API integration. 
+                All designs and work present were made by <a href="https://liamdes.github.io/">Liam Deshaies</a> unless otherwise credited (eg. header divder shapes made using an available tool) 
+                as part of a project in PDX Code Guild's Fullstack Bootcamp program. 
+                Base hat images were found and color altered, otherwise all products were drawn for the sake of being an asset to the app.
+                </p>
+                <button @click="closeModal">Got It!</button>
+            </section>
+        </div>`,
+    delimiters: ['[[', ']]'],
+    methods: {
+        closeModal() {
+            this.$parent.modalUp = false
+        },
+    }
+})
+
 Vue.component('CheckoutComplete', {
     template: `<div class="local-order">Sticker Fellas Reference Order #<strong>[[orderInfo.id]]</strong></div>`,
     data: () => {
@@ -671,6 +729,8 @@ new Vue({
         showProfile: false,
         showAdmin: false,
         menuHover: false,
+        modalUp: false,
+        content: '',
         lastFilter: null,
         newItem: true,
         shoppingCart: [],
