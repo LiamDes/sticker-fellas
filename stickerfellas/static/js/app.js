@@ -1,3 +1,13 @@
+Vue.component('FooterModals', {
+    template: `
+        <div class="overlay">
+            <section class="modal">
+                Oh Wow.
+                <button @click="">Got It!</button>
+            </section>
+        </div>`
+})
+
 Vue.component('CheckoutComplete', {
     template: `<div class="local-order">Sticker Fellas Reference Order #<strong>[[orderInfo.id]]</strong></div>`,
     data: () => {
@@ -671,6 +681,7 @@ new Vue({
         showProfile: false,
         showAdmin: false,
         menuHover: false,
+        modalUp: false,
         lastFilter: null,
         newItem: true,
         shoppingCart: [],

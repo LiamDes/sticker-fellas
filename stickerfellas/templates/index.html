@@ -22,7 +22,7 @@
 <body>
     <div id="app">
         {% csrf_token %}
-        <header>
+        <header id="top">
             <nav class="accounts">
                 <nav>
                 {% if user.is_authenticated %}
@@ -152,7 +152,8 @@
         </main>
 
         <footer>
-            <span>Fake LLC©</span><span>FAQ</span><span>About</span>
+            <span>Fake LLC©</span><a @click="modalUp = true" href="#top">FAQ</a><a>About</a>
+            <footer-modals v-if="modalUp"></footer-modals>
         </footer>
     </div>  
 </body>

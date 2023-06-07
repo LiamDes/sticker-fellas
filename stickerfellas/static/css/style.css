@@ -650,13 +650,32 @@ footer {
     padding: 5px 10px;
 }
 
-footer span:first-child {
+footer span {
     font-size: 8pt;
 }
 
-footer span:not(:first-child) {
+footer a {
     cursor: pointer;
     font-weight: 700;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.modal {
+    background-color: var(--background);
+    padding: 10px;
+    border: 2px solid var(--accent);
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 2em auto;
 }
 
 ::-webkit-scrollbar {
