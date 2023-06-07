@@ -644,7 +644,6 @@ ul {
 }
 
 footer {
-    background-color: var(--accent);
     display: flex;
     justify-content: space-between;
     padding: 5px 10px;
@@ -676,6 +675,11 @@ footer a {
     border-radius: 5px;
     max-width: 400px;
     margin: 2em auto;
+}
+
+.modal p {
+    padding: 0 1em;
+    text-align: justify;
 }
 
 .modal ol {

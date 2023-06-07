@@ -40,7 +40,10 @@ Vue.component('FooterModals', {
                 </li>
                 </ol>
                 <p v-else>
-                Sticker Fellas is a mock e-commerce app made to demonstrate <a href="https://liamdes.github.io/">Liam's</a> work abilities.
+                Sticker Fellas is a mock e-commerce app made to demonstrate work abilities using a third party payment API integration. 
+                All designs and work present were made by <a href="https://liamdes.github.io/">Liam Deshaies</a> unless otherwise credited (eg. header divder shapes made using an available tool) 
+                as part of a project in PDX Code Guild's Fullstack Bootcamp program. 
+                Base hat images were found and color altered, otherwise all products were drawn for the sake of being an asset to the app.
                 </p>
                 <button @click="closeModal">Got It!</button>
             </section>

@@ -146,7 +146,32 @@ def checkout_session(request):
             cancel_url = '%s' % settings.PAYMENT_CANCEL_URL,
             payment_method_types = ['card'],
             mode = 'payment',
-            line_items = full_cart
+            line_items = full_cart,
+            shipping_address_collection={"allowed_countries": ["US", "CA"]},
+            shipping_options=[
+                {
+                    "shipping_rate_data": {
+                        "type": "fixed_amount",
+                        "fixed_amount": {"amount": 500, "currency": "usd"},
+                        "display_name": "Standard Ground Shipping",
+                        "delivery_estimate": {
+                        "minimum": {"unit": "business_day", "value": 3},
+                        "maximum": {"unit": "business_day", "value": 7},
+                        },
+                    },
+                },
+                {
+                    "shipping_rate_data": {
+                        "type": "fixed_amount",
+                        "fixed_amount": {"amount": 1500, "currency": "usd"},
+                        "display_name": "Next Day Air",
+                        "delivery_estimate": {
+                        "minimum": {"unit": "business_day", "value": 1},
+                        "maximum": {"unit": "business_day", "value": 1},
+                        },
+                    },
+                },
+            ],
         )
         return Response({'sessionId': checkout_session['id']})
     except Exception as e:
