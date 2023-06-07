@@ -152,7 +152,10 @@
         </main>
 
         <footer>
-            <span>Fake LLC©</span><a @click="modalUp = true" href="#top">FAQ</a><a>About</a>
+            <span>Fake LLC©</span>
+            <a @click="modalUp = true; content='FAQ'" href="#top">FAQ</a>
+            <a @click="modalUp = true; content='About'" href="#top">About</a>
+            <footer-modals v-if="modalUp"></footer-modals>
             <footer-modals v-if="modalUp"></footer-modals>
         </footer>
     </div>  
